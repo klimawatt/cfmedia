@@ -1,10 +1,11 @@
 ---
+import { ArrowUpRight } from '@lucide/astro';
 import SiteLayout from '../layouts/SiteLayout.astro';
 
 const services = [
-  { number: '01', name: 'SEO', description: 'Maak je website beter vindbaar in organische zoekresultaten.', href: '/diensten/seo/' },
-  { number: '02', name: 'GEO', description: 'Maak je informatie vindbaar in ChatGPT, Perplexity en Google AI Overviews.', href: '/diensten/geo/' },
-  { number: '03', name: 'Webdesign', description: 'Een heldere, toegankelijke website die prettig werkt op ieder scherm.', href: '/diensten/webdesign/' },
+  { number: '01', name: 'SEO', description: 'Zorg dat je gevonden wordt op de vragen die ertoe doen.', href: '/diensten/seo/', tone: 'blue' },
+  { number: '02', name: 'GEO', description: 'Maak je informatie herkenbaar voor AI-zoekmachines.', href: '/diensten/geo/', tone: 'lime' },
+  { number: '03', name: 'Webdesign', description: 'Geef bezoekers een website die logisch werkt en prettig leest.', href: '/diensten/webdesign/', tone: 'coral' },
 ];
 
 const organization = {
@@ -14,16 +15,10 @@ const organization = {
   url: 'https://www.cfmedia.nl/',
   logo: 'https://www.cfmedia.nl/images/cfmedia-logo.svg',
   description: 'Nederlands bureau voor SEO, GEO en webdesign.',
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: '[ADRES INVULLEN]',
-    addressCountry: 'NL',
-  },
+  address: { '@type': 'PostalAddress', streetAddress: '[ADRES INVULLEN]', addressCountry: 'NL' },
   contactPoint: {
-    '@type': 'ContactPoint',
-    contactType: 'customer service',
-    email: '[E-MAIL INVULLEN]',
-    telephone: '[TELEFOON INVULLEN]',
+    '@type': 'ContactPoint', contactType: 'customer service',
+    email: '[E-MAIL INVULLEN]', telephone: '[TELEFOON INVULLEN]',
   },
   sameAs: [],
 };
@@ -35,86 +30,187 @@ const organization = {
   canonical="https://www.cfmedia.nl/"
   structuredData={organization}
 >
-  <section class="hero">
-    <div class="container hero-content">
-      <p class="eyebrow">CF Media · SEO · GEO · webdesign</p>
-      <h1>Gevonden worden begint met een goed fundament.</h1>
-      <p class="intro">We helpen je website beter vindbaar te maken in zoekmachines en AI, en prettiger te laten werken voor je bezoekers.</p>
-      <a class="button-primary" href="/contact/">Plan een gesprek <span aria-hidden="true">↗</span></a>
-    </div>
-    <div class="hero-index" aria-hidden="true"><span>CF</span><span>MEDIA</span><span>NL · 01</span></div>
-  </section>
+  <div class="home-page">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> CF Media · SEO / GEO / webdesign</p>
+          <h1 id="hero-title">Je website verdient een plek in beeld.</h1>
+          <p class="intro">We maken je online verhaal beter vindbaar, begrijpelijker en klaar om bezoekers verder te helpen.</p>
+          <a class="hero-link" href="/diensten/">Ontdek wat we doen <ArrowUpRight size={18} aria-hidden="true" /></a>
+          <div class="hero-index" aria-hidden="true"><span>01</span><span>STRATEGIE</span><span>02</span><span>RESULTAAT</span></div>
+        </div>
 
-  <section class="container services section-space" aria-labelledby="services-heading">
-    <div class="section-heading"><p class="eyebrow">Wat we doen</p><h2 id="services-heading">Werk aan je online basis.</h2></div>
-    <div class="service-list">
-      {services.map((service) => <a class="service-row" href={service.href}><span>{service.number}</span><div><h3>{service.name}</h3><p>{service.description}</p></div><span class="arrow" aria-hidden="true">↗</span></a>)}
-    </div>
-  </section>
+        <form class="meeting-card" name="cfmedia-gesprek" method="POST" action="/contact/bedankt/" data-netlify="true" netlify-honeypot="bot-field">
+          <input type="hidden" name="form-name" value="cfmedia-gesprek" />
+          <p class="honeypot"><label>Niet invullen <input name="bot-field" /></label></p>
+          <div class="form-heading"><span class="form-mark" aria-hidden="true">CF</span><div><p class="eyebrow">Eerste stap</p><h2>Plan een gesprek</h2></div></div>
+          <p class="form-intro">Laat je gegevens achter. Dan stemmen we samen een moment af.</p>
+          <div class="field"><label for="meeting-name">Naam</label><input id="meeting-name" name="name" type="text" autocomplete="name" maxlength="120" placeholder="Je naam" required /></div>
+          <div class="field-row">
+            <div class="field"><label for="meeting-email">E-mailadres</label><input id="meeting-email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="naam@bedrijf.nl" required /></div>
+            <div class="field"><label for="meeting-phone">Telefoon</label><input id="meeting-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="40" placeholder="06 1234 5678" required /></div>
+          </div>
+          <p class="privacy-note">We gebruiken je gegevens alleen om contact met je op te nemen. <a href="/privacyverklaring/">Privacy</a></p>
+          <button class="button-primary" type="submit">Vraag een gesprek aan <ArrowUpRight size={18} aria-hidden="true" /></button>
+        </form>
+      </div>
+      <div class="hero-bottom container"><span>Nederland · online en dichtbij</span><span>Van eerste vraag tot helder plan <span aria-hidden="true">↓</span></span></div>
+    </section>
 
-  <section class="proof-band" aria-labelledby="cases-heading">
-    <div class="container proof-inner">
-      <div><p class="eyebrow">Werk in de praktijk</p><h2 id="cases-heading">Cases, zodra ze verteld mogen worden.</h2><p>We vullen deze plek met klantwerk na toestemming en controle van de inhoud.</p><a class="text-link" href="/cases/">Bekijk de case-opzet <span aria-hidden="true">↗</span></a></div>
-      <div class="case-placeholder"><span>CASE 01</span><strong>[CASE: klantnaam + resultaat invullen]</strong><a href="/cases/case-invullen/">Bekijk de invulopzet</a></div>
-    </div>
-  </section>
+    <section class="container services section-space" aria-labelledby="services-heading">
+      <div class="section-heading"><p class="eyebrow">Waar we aan werken</p><h2 id="services-heading">Drie disciplines.<br />Eén sterke basis.</h2><p>Je kiest wat je nodig hebt. We verbinden de onderdelen waar dat zinvol is.</p></div>
+      <div class="service-grid">
+        {services.map((service) => <a class={`service-block ${service.tone}`} href={service.href}><span class="block-top"><span>{service.number} / DIENST</span><ArrowUpRight size={20} aria-hidden="true" /></span><span class="block-symbol" aria-hidden="true">{service.number === '01' ? '⌕' : service.number === '02' ? '✳' : '▤'}</span><h3>{service.name}</h3><p>{service.description}</p><span class="block-link">Meer over {service.name} <ArrowUpRight size={16} aria-hidden="true" /></span></a>)}
+      </div>
+    </section>
 
-  <section class="container logo-section" aria-labelledby="logos-heading">
-    <p class="eyebrow">Samenwerkingen</p><h2 id="logos-heading">Logo’s verschijnen hier met toestemming.</h2>
-    <div class="logo-placeholders"><span>[LOGO KLANT 1 INVULLEN]</span><span>[LOGO KLANT 2 INVULLEN]</span><span>[LOGO KLANT 3 INVULLEN]</span></div>
-  </section>
+    <section class="case-section" aria-labelledby="cases-heading">
+      <div class="container case-layout">
+        <div class="case-copy"><p class="eyebrow">Werk in de praktijk</p><h2 id="cases-heading">Goed werk laat zich zien.</h2><p>We delen cases zodra de klantnaam, aanpak en uitkomst goedgekeurd zijn.</p><a class="text-link" href="/cases/">Bekijk de cases <ArrowUpRight size={17} aria-hidden="true" /></a></div>
+        <a class="case-block" href="/cases/case-invullen/"><span class="case-kicker">CASE / 001</span><span class="case-shape" aria-hidden="true"><i></i><i></i><i></i></span><strong>[CASE: klantnaam + resultaat invullen]</strong><span class="case-bottom">Bekijk de case-opzet <ArrowUpRight size={17} aria-hidden="true" /></span></a>
+      </div>
+    </section>
 
-  <section class="process-section">
-    <div class="container process-inner">
-      <div><p class="eyebrow">Zo werken we</p><h2>Van vraag naar volgende stap.</h2></div>
-      <ol><li><span>01</span><h3>Verkennen</h3><p>We bespreken je vraag, doelen en huidige website.</p></li><li><span>02</span><h3>Kiezen</h3><p>We brengen opties in kaart en bepalen wat eerst moet.</p></li><li><span>03</span><h3>Verbeteren</h3><p>We voeren het werk uit en bespreken wat de volgende stap is.</p></li></ol>
-    </div>
-  </section>
+    <section class="container partners" aria-labelledby="partners-heading">
+      <div class="partners-heading"><p class="eyebrow">Samenwerkingen</p><h2 id="partners-heading">Vertrouwen bouw je samen.</h2></div>
+      <div class="logo-placeholders"><span>[LOGO KLANT 1 INVULLEN]</span><span>[LOGO KLANT 2 INVULLEN]</span><span>[LOGO KLANT 3 INVULLEN]</span></div>
+    </section>
 
-  <section class="container final-cta">
-    <p class="eyebrow">Samen aan de slag</p><h2>Waar wil je je website mee vooruithelpen?</h2><a class="button-primary" href="/contact/">Plan een gesprek <span aria-hidden="true">↗</span></a>
-  </section>
+    <section class="process-section" aria-labelledby="process-heading">
+      <div class="container process-inner">
+        <div class="process-heading"><p class="eyebrow">Zo werken we</p><h2 id="process-heading">Geen mist.<br />Wel een volgende stap.</h2><p>Je weet waar we aan werken en waarom dat de prioriteit krijgt.</p></div>
+        <ol class="process-grid"><li><span class="step-number">01</span><div><h3>Luisteren</h3><p>We brengen je vraag en doelen scherp in beeld.</p></div></li><li><span class="step-number">02</span><div><h3>Richting kiezen</h3><p>We onderzoeken de situatie en maken keuzes concreet.</p></div></li><li><span class="step-number">03</span><div><h3>Verbeteren</h3><p>We voeren uit, delen wat verandert en bepalen wat volgt.</p></div></li></ol>
+      </div>
+    </section>
+
+    <section class="knowledge-section">
+      <div class="container knowledge-inner"><div><p class="eyebrow">Kennis om verder te komen</p><h2>Vragen verdienen duidelijke antwoorden.</h2></div><a class="knowledge-link" href="/kennisbank/">Naar de kennisbank <ArrowUpRight size={20} aria-hidden="true" /></a></div>
+      <div class="container knowledge-tags" aria-label="Kennisbankcategorieën"><a href="/kennisbank/seo/">SEO <span>01</span></a><a href="/kennisbank/geo/">GEO <span>02</span></a><a href="/kennisbank/webdesign/">Webdesign <span>03</span></a></div>
+    </section>
+
+    <section class="container final-cta"><p class="eyebrow">Klaar voor een eerste stap?</p><h2>Leg je vraag bij ons neer.</h2><a class="button-primary" href="#hero-title">Plan een gesprek <ArrowUpRight size={18} aria-hidden="true" /></a></section>
+  </div>
 </SiteLayout>
 
 <style>
-  .hero { position: relative; overflow: hidden; min-height: min(760px, 84vh); background: var(--hero-bg); color: #fff; }
-  .hero-content { position: relative; z-index: 1; display: flex; min-height: min(760px, 84vh); flex-direction: column; align-items: flex-start; justify-content: center; padding-block: 5rem; }
-  .hero .eyebrow { color: #c5f0d0; }
-  h1 { max-width: 13ch; margin: 1.1rem 0; font-size: var(--type-h1-hero); line-height: 0.96; }
-  .intro { max-width: 42rem; margin: 0 0 2rem; color: #e2f1e7; font-size: var(--type-lead); line-height: 1.6; }
-  .hero .button-primary { border-color: #fff; background: #fff; color: #17231d; }
-  .hero .button-primary:hover { border-color: var(--coral); background: var(--coral); }
-  .hero-index { position: absolute; right: 3%; bottom: 3%; display: flex; align-items: flex-end; gap: 0.6rem; color: #ffffff19; font-weight: 800; line-height: 0.8; }
-  .hero-index span:first-child { font-size: var(--type-watermark); }
-  .hero-index span:nth-child(2) { padding-bottom: 1.3rem; font-size: var(--type-watermark-vertical); writing-mode: vertical-rl; }
-  .hero-index span:last-child { padding-bottom: 1.4rem; color: #c5f0d0; font-size: 0.8rem; writing-mode: vertical-rl; }
-  .services { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 4rem; }
-  .section-heading h2, .proof-inner h2, .process-inner h2, .logo-section h2, .final-cta h2 { max-width: 16ch; margin: 0.6rem 0; font-size: var(--type-h2); line-height: 1.08; }
-  .service-row { display: grid; grid-template-columns: 2rem 1fr auto; align-items: center; gap: 1rem; padding-block: 1.25rem; border-top: 1px solid var(--line); text-decoration: none; }
-  .service-row > span:first-child, .arrow { color: var(--green); font-weight: 700; }
-  .service-row h3 { margin: 0; font-size: 1.35rem; }
-  .service-row p { margin: 0.35rem 0 0; color: var(--muted); line-height: 1.55; }
-  .service-row:hover h3 { color: var(--green); }
-  .proof-band { padding-block: 5rem; background: var(--green-bright); }
-  .proof-inner { display: grid; grid-template-columns: 1fr 0.8fr; align-items: center; gap: 3rem; }
-  .proof-inner > div:first-child > p:not(.eyebrow) { max-width: 35rem; color: var(--muted); line-height: 1.6; }
-  .text-link, .case-placeholder a { color: var(--green); font-weight: 700; text-underline-offset: 0.2em; }
-  .case-placeholder { display: flex; min-height: 15rem; flex-direction: column; justify-content: space-between; gap: 1rem; padding: 1.5rem; border: 1px solid var(--green); background: var(--paper); }
-  .case-placeholder span { color: var(--green); font-size: 0.8rem; font-weight: 700; }
-  .case-placeholder strong { max-width: 18ch; font-size: 1.7rem; }
-  .logo-section { padding-block: 5rem; }
-  .logo-section h2 { max-width: 22ch; }
-  .logo-placeholders { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem; }
-  .logo-placeholders span { display: grid; min-height: 5rem; place-items: center; border: 1px dashed var(--line); color: var(--muted); font-size: 0.85rem; text-align: center; }
-  .process-section { padding-block: 5rem; border-block: 1px solid var(--line); background: var(--surface); }
-  .process-inner { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 4rem; }
-  .process-inner ol { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin: 0; padding: 0; list-style: none; }
-  .process-inner li { border-top: 2px solid var(--green); padding-top: 1rem; }
-  .process-inner li > span { color: var(--green); font-size: 0.8rem; font-weight: 700; }
-  .process-inner li h3 { margin: 1.5rem 0 0.5rem; font-size: 1.2rem; }
-  .process-inner li p { margin: 0; color: var(--muted); line-height: 1.55; }
-  .final-cta { padding-block: 5rem 6rem; }
-  .final-cta h2 { margin-bottom: 1.5rem; }
-  @media (max-width: 760px) { .services, .proof-inner, .process-inner { grid-template-columns: 1fr; gap: 2rem; } .process-inner ol { grid-template-columns: 1fr; } .process-inner li h3 { margin-top: 0.75rem; } }
-  @media (max-width: 520px) { .hero, .hero-content { min-height: 76vh; } .hero-index { right: -14%; bottom: 8%; opacity: 0.7; } .logo-placeholders { grid-template-columns: 1fr; } }
+  .home-page {
+    --hero-surface: #e9f0e9;
+    --hero-text: #17231d;
+    --service-blue: #dcecff;
+    --service-lime: #c8ec7c;
+    --service-coral: #ffddd3;
+    --case-bg: #19382c;
+    --case-ink: #f5f7f2;
+    --light-ink: #17231d;
+    --focus-bg: #f4d66f;
+  }
+  @media (prefers-color-scheme: dark) {
+    .home-page { --hero-surface: #202a23; --hero-text: #edf4ee; --service-blue: #203748; --service-lime: #32452a; --service-coral: #4a302b; --case-bg: #243f32; --case-ink: #f5f7f2; --light-ink: #f5f7f2; --focus-bg: #4a4224; }
+  }
+  .hero { position: relative; overflow: hidden; padding-block: 3.5rem 1.25rem; background-color: var(--hero-surface); color: var(--hero-text); background-image: radial-gradient(var(--line) 0.7px, transparent 0.7px); background-size: 18px 18px; }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(23rem, 0.92fr); align-items: center; gap: clamp(2rem, 5vw, 5rem); }
+  .hero-copy { padding-block: 2.5rem; }
+  .hero-copy .eyebrow { display: flex; align-items: center; gap: 0.65rem; color: var(--green); }
+  .status-dot { width: 0.55rem; height: 0.55rem; flex: 0 0 auto; border-radius: 50%; background: var(--coral); }
+  h1 { max-width: 11ch; margin: 1.25rem 0; font-size: 5.2rem; line-height: 0.98; }
+  .intro { max-width: 35rem; margin: 0 0 1.5rem; color: var(--muted); font-size: 1.2rem; line-height: 1.6; }
+  .hero-link, .text-link, .knowledge-link { display: inline-flex; align-items: center; gap: 0.65rem; color: var(--green); font-weight: 700; text-underline-offset: 0.2em; }
+  .hero-index { display: flex; align-items: center; gap: 0.65rem; margin-top: 3.5rem; color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; }
+  .hero-index span:nth-child(odd) { color: var(--green); }
+  .meeting-card { position: relative; padding: 1.6rem; border: 1px solid var(--line); border-top: 5px solid var(--coral); background: var(--surface); box-shadow: 12px 12px 0 var(--green-bright); }
+  .form-heading { display: flex; align-items: center; gap: 0.9rem; }
+  .form-mark { display: grid; width: 3rem; height: 3rem; flex: 0 0 auto; place-items: center; background: var(--green); color: var(--button-ink); font-size: 0.85rem; font-weight: 800; }
+  .form-heading .eyebrow { margin: 0 0 0.25rem; }
+  .form-heading h2 { margin: 0; font-size: 1.65rem; }
+  .form-intro { margin: 1rem 0 1.3rem; color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+  .field { display: grid; min-width: 0; gap: 0.35rem; }
+  .field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; margin-top: 0.85rem; }
+  .field label { font-size: 0.82rem; font-weight: 700; }
+  .field input { width: 100%; min-width: 0; min-height: 2.9rem; padding: 0.7rem; border: 1px solid var(--line); border-radius: 0; background: var(--paper); color: var(--ink); font: inherit; font-size: 0.9rem; }
+  .field input::placeholder { color: var(--muted); opacity: 0.8; }
+  .privacy-note { margin: 0.9rem 0 1rem; color: var(--muted); font-size: 0.75rem; line-height: 1.5; }
+  .privacy-note a { color: var(--green); font-weight: 700; text-underline-offset: 0.15em; }
+  .meeting-card .button-primary { display: flex; width: 100%; justify-content: space-between; cursor: pointer; }
+  .honeypot { position: absolute; left: -9999px; }
+  .hero-bottom { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.25rem; padding-block: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.75rem; }
+  .section-space { padding-block: 6rem; }
+  .services { display: grid; grid-template-columns: 0.7fr 1.3fr; gap: 3rem; }
+  .section-heading h2, .case-copy h2, .partners h2, .process-heading h2, .knowledge-inner h2, .final-cta h2 { max-width: 15ch; margin: 0.65rem 0; font-size: 3rem; line-height: 1.05; }
+  .section-heading > p:last-child, .case-copy > p:not(.eyebrow), .process-heading > p:last-child { max-width: 28rem; color: var(--muted); line-height: 1.65; }
+  .service-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.85rem; }
+  .service-block { position: relative; display: flex; min-width: 0; min-height: 20rem; flex-direction: column; align-items: flex-start; padding: 1.15rem; color: var(--light-ink); text-decoration: none; transition: transform 180ms ease; }
+  .service-block:hover { transform: translateY(-4px); }
+  .service-block.blue { background: var(--service-blue); }
+  .service-block.lime { background: var(--service-lime); }
+  .service-block.coral { background: var(--service-coral); }
+  .block-top { display: flex; width: 100%; justify-content: space-between; color: inherit; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; }
+  .block-symbol { margin-top: auto; font-size: 2.4rem; line-height: 1; }
+  .service-block h3 { margin: 0.75rem 0 0.4rem; font-size: 1.55rem; }
+  .service-block p { margin: 0 0 1.25rem; color: inherit; font-size: 0.9rem; line-height: 1.5; }
+  .block-link { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: auto; font-size: 0.8rem; font-weight: 700; text-underline-offset: 0.15em; }
+  .case-section { padding-block: 5rem; background: var(--green-bright); }
+  .case-layout { display: grid; grid-template-columns: 0.85fr 1.15fr; align-items: center; gap: 3rem; }
+  .case-copy > p:not(.eyebrow) { color: var(--ink); }
+  .case-copy .text-link { margin-top: 0.75rem; color: var(--ink); }
+  .case-block { position: relative; display: flex; min-height: 19rem; flex-direction: column; align-items: flex-start; justify-content: space-between; overflow: hidden; padding: 1.4rem; background: var(--case-bg); color: var(--case-ink); text-decoration: none; }
+  .case-kicker, .case-bottom { position: relative; z-index: 1; display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; font-weight: 700; }
+  .case-block strong { position: relative; z-index: 1; max-width: 16ch; font-size: 2rem; line-height: 1.1; }
+  .case-shape { position: absolute; top: 0; right: 0; display: flex; width: 48%; height: 100%; align-items: center; justify-content: center; gap: 0.45rem; opacity: 0.65; transform: rotate(-24deg) translate(12%, -8%); }
+  .case-shape i { display: block; width: 1.6rem; height: 75%; background: var(--coral); }
+  .case-shape i:nth-child(2) { height: 105%; background: var(--service-lime); }
+  .case-shape i:nth-child(3) { height: 55%; background: var(--service-blue); }
+  .partners { display: grid; grid-template-columns: 0.8fr 1.2fr; align-items: center; gap: 3rem; padding-block: 5rem; }
+  .partners h2 { font-size: 2.4rem; }
+  .logo-placeholders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
+  .logo-placeholders span { display: grid; min-height: 4.5rem; place-items: center; padding: 0.5rem; border: 1px dashed var(--line); color: var(--muted); font-size: 0.7rem; text-align: center; }
+  .process-section { padding-block: 5rem; background: var(--surface); }
+  .process-inner { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 3rem; }
+  .process-grid { display: grid; grid-template-columns: 1fr; gap: 0; margin: 0; padding: 0; list-style: none; }
+  .process-grid li { display: grid; grid-template-columns: 3rem 1fr; gap: 1rem; padding-block: 1.1rem; border-top: 1px solid var(--line); }
+  .step-number { color: var(--green); font-size: 0.8rem; font-weight: 700; }
+  .process-grid h3 { margin: 0; font-size: 1.15rem; }
+  .process-grid p { margin: 0.35rem 0 0; color: var(--muted); line-height: 1.55; }
+  .knowledge-section { padding-block: 4.5rem; background: var(--service-blue); color: var(--light-ink); }
+  .knowledge-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; }
+  .knowledge-inner h2 { max-width: 13ch; }
+  .knowledge-link { flex: 0 0 auto; color: var(--light-ink); }
+  .knowledge-tags { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2.5rem; }
+  .knowledge-tags a { display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid currentColor; color: inherit; font-weight: 700; text-decoration: none; }
+  .knowledge-tags span { font-size: 0.75rem; font-weight: 400; }
+  .final-cta { display: flex; min-height: 18rem; flex-direction: column; align-items: flex-start; justify-content: center; padding-block: 4rem; }
+  .final-cta h2 { margin-bottom: 1.25rem; }
+  @media (max-width: 1000px) {
+    .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.9fr); gap: 2rem; }
+    .services { grid-template-columns: 1fr; gap: 2rem; }
+    .service-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .service-block { min-height: 18rem; }
+  }
+  @media (max-width: 760px) {
+    .hero { padding-top: 1.5rem; }
+    .hero-grid, .case-layout, .partners, .process-inner { grid-template-columns: 1fr; }
+    .hero-copy { padding-block: 2rem 0.5rem; }
+    h1 { max-width: 12ch; font-size: 3.4rem; }
+    .hero-index { margin-top: 2rem; }
+    .meeting-card { max-width: 38rem; margin: 0 0.75rem 1rem 0; }
+    .hero-bottom { margin-top: 1.5rem; }
+    .section-heading h2, .case-copy h2, .partners h2, .process-heading h2, .knowledge-inner h2, .final-cta h2 { font-size: 2.25rem; }
+    .case-block { min-height: 16rem; }
+    .partners { gap: 1.5rem; }
+    .knowledge-inner { align-items: flex-start; flex-direction: column; }
+  }
+  @media (max-width: 520px) {
+    .hero-grid { width: min(100% - 2rem, 76rem); }
+    h1 { font-size: 2.8rem; }
+    .hero-bottom { align-items: flex-start; flex-direction: column; }
+    .section-space, .case-section, .partners, .process-section { padding-block: 3.5rem; }
+    .service-grid { grid-template-columns: 1fr; }
+    .service-block { min-height: 16rem; }
+    .case-layout { gap: 1.5rem; }
+    .logo-placeholders { grid-template-columns: 1fr; }
+    .logo-placeholders span { min-height: 3.5rem; }
+    .knowledge-section { padding-block: 3.5rem; }
+    .knowledge-tags { grid-template-columns: 1fr; gap: 0.75rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .service-block { transition: none; } }
 </style>

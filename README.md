@@ -29,7 +29,7 @@ De productiebuild is statisch en kan op Netlify of Vercel worden gehost. Stel de
 1. Importeer de repository in Netlify.
 2. Gebruik `npm run build` als build command en `dist` als publicatiedirectory.
 3. Koppel `www.cfmedia.nl` en stel dit in als primair domein.
-4. Netlify Forms detecteert het formulier `cfmedia-contact` tijdens de deploy. Controleer daarna een echte inzending in Netlify Forms.
+4. Netlify Forms detecteert de formulieren `cfmedia-gesprek` en `cfmedia-contact` tijdens de deploy. Controleer daarna een echte inzending in Netlify Forms.
 
 ### Vercel
 
