@@ -1,0 +1,38 @@
+---
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { breadcrumbSchema } from '../../utils/structured-data';
+
+const categories = [
+  { slug: 'seo', name: 'SEO', description: 'Techniek, inhoud en organische vindbaarheid.' },
+  { slug: 'geo', name: 'GEO', description: 'Informatie vindbaar maken in AI-zoekervaringen.' },
+  { slug: 'webdesign', name: 'Webdesign', description: 'Websites die helder, toegankelijk en prettig in gebruik zijn.' },
+];
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Kennisbank', href: '/kennisbank/' }];
+const structuredData = breadcrumbSchema(crumbs);
+---
+
+<SiteLayout title="Kennisbank | CF Media" description="Lees inzichten over SEO, GEO en webdesign. Praktische uitleg voor betere vindbaarheid en websites die prettig werken." canonical="https://www.cfmedia.nl/kennisbank/" structuredData={structuredData}>
+  <Breadcrumbs items={crumbs} />
+  <header class="container page-hero">
+    <p class="eyebrow">Kennis en uitleg</p>
+    <h1>Kennisbank</h1>
+    <p>Korte, praktische uitleg over vindbaarheid en websites. Artikelen verschijnen nadat ze zijn gecontroleerd en afgerond.</p>
+  </header>
+  <section class="container category-list" aria-label="Kennisbankcategorieën">
+    {categories.map((category, index) => <a class="category-row" href={`/kennisbank/${category.slug}/`}><span>0{index + 1}</span><div><h2>{category.name}</h2><p>{category.description}</p></div><span class="arrow" aria-hidden="true">↗</span></a>)}
+  </section>
+</SiteLayout>
+
+<style>
+  .page-hero { padding-block: 4rem 3rem; }
+  h1 { margin: 0.75rem 0; font-size: clamp(3rem, 7vw, 6rem); line-height: 1; }
+  .page-hero > p:last-child { max-width: 44rem; color: var(--muted); font-size: 1.15rem; line-height: 1.65; }
+  .category-list { padding-bottom: 6rem; }
+  .category-row { display: grid; grid-template-columns: 3rem 1fr auto; align-items: center; gap: 1.5rem; padding-block: 1.6rem; border-top: 1px solid var(--line); text-decoration: none; }
+  .category-row > span:first-child, .arrow { color: var(--green); font-weight: 700; }
+  h2 { margin: 0; font-size: clamp(1.5rem, 3vw, 2rem); }
+  .category-row p { margin: 0.5rem 0 0; color: var(--muted); }
+  .arrow { font-size: 1.3rem; }
+  @media (max-width: 520px) { .category-row { grid-template-columns: 2rem 1fr auto; gap: 0.75rem; } }
+</style>

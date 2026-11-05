@@ -1,0 +1,90 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, render } from 'astro:content';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import { allServicePages } from '../../../data/services';
+import { breadcrumbSchema } from '../../../utils/structured-data';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('articles', ({ data }) => !data.draft);
+  return articles.map((article) => ({
+    params: { category: article.data.category, slug: article.id.split('/').at(-1)! },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+const slug = article.id.split('/').at(-1)!;
+const { Content } = await render(article);
+const crumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Kennisbank', href: '/kennisbank/' },
+  { label: article.data.category.toUpperCase(), href: `/kennisbank/${article.data.category}/` },
+  { label: article.data.title, href: `/kennisbank/${article.data.category}/${slug}/` },
+];
+const services = article.data.serviceTags.map((tag) => allServicePages.find((service) => service.slug === tag || service.slug.endsWith(`/${tag}`))).filter((service) => service !== undefined);
+const published = new Date(article.data.datePublished);
+const modified = new Date(article.data.dateModified);
+const formatDate = (date: Date) => new Intl.DateTimeFormat('nl-NL', { dateStyle: 'long' }).format(date);
+const canonical = `https://www.cfmedia.nl/kennisbank/${article.data.category}/${slug}/`;
+const structuredData = [
+  breadcrumbSchema(crumbs),
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.data.title,
+    description: article.data.description,
+    datePublished: article.data.datePublished,
+    dateModified: article.data.dateModified,
+    author: {
+      '@type': 'Person',
+      name: article.data.author.name,
+      jobTitle: article.data.author.jobTitle,
+      image: new URL(article.data.author.photo.src, Astro.site).href,
+      url: new URL(`/over-ons/${article.data.author.teamSlug}/`, Astro.site).href,
+    },
+    publisher: { '@type': 'Organization', name: 'CF Media', url: 'https://www.cfmedia.nl/' },
+    mainEntityOfPage: canonical,
+  },
+];
+---
+
+<SiteLayout title={`${article.data.title} | CF Media`} description={article.data.description} canonical={canonical} structuredData={structuredData}>
+  <Breadcrumbs items={crumbs} />
+  <header class="container article-header">
+    <p class="eyebrow">Kennisbank · {article.data.category}</p>
+    <h1>{article.data.title}</h1>
+    <p class="summary">{article.data.description}</p>
+    <p class="dates">Gepubliceerd <time datetime={article.data.datePublished}>{formatDate(published)}</time> · Bijgewerkt <time datetime={article.data.dateModified}>{formatDate(modified)}</time></p>
+  </header>
+  <article class="container article-layout">
+    <div class="article-body"><Content />
+      {services.length > 0 && <aside class="related-services"><h2>Verder met {article.data.category}</h2><ul>{services.map((service) => <li><a href={`/diensten/${service.slug}/`}>{service.name} bij CF Media</a></li>)}</ul></aside>}
+    </div>
+    <aside class="author-box" aria-label="Over de auteur">
+      <Image src={article.data.author.photo} alt={`Portret van ${article.data.author.name}`} width={112} height={112} />
+      <div><p class="eyebrow">Auteur</p><h2>{article.data.author.name}</h2><p>{article.data.author.jobTitle}</p><a href={`/over-ons/${article.data.author.teamSlug}/`}>Meer over de auteur</a></div>
+    </aside>
+  </article>
+</SiteLayout>
+
+<style>
+  .article-header { max-width: 58rem; padding-block: 3rem 2rem; }
+  h1 { margin: 0.75rem 0 1rem; font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1.03; }
+  .summary { color: var(--muted); font-size: 1.2rem; line-height: 1.6; }
+  .dates { margin-top: 1.5rem; color: var(--muted); font-size: 0.9rem; }
+  .article-layout { display: grid; grid-template-columns: minmax(0, 1fr) 16rem; align-items: start; gap: 4rem; padding-bottom: 6rem; }
+  .article-body { min-width: 0; line-height: 1.75; }
+  .article-body :global(h2) { margin-top: 2.5rem; font-size: 1.7rem; }
+  .article-body :global(a) { color: var(--green); text-underline-offset: 0.2em; }
+  .author-box { display: grid; gap: 1rem; padding-top: 1.25rem; border-top: 2px solid var(--green); }
+  .author-box :global(img) { width: 7rem; height: 7rem; object-fit: cover; }
+  .author-box h2 { margin: 0.3rem 0; font-size: 1.1rem; }
+  .author-box p { margin: 0.3rem 0; color: var(--muted); }
+  .author-box a { color: var(--green); font-weight: 700; text-underline-offset: 0.2em; }
+  .related-services { margin-top: 3rem; padding: 1rem; border-left: 3px solid var(--green); background: var(--surface); }
+  .related-services h2 { margin-top: 0 !important; font-size: 1.2rem !important; }
+  .related-services ul { margin-bottom: 0; }
+  @media (max-width: 700px) { .article-layout { grid-template-columns: 1fr; gap: 2rem; } .author-box { grid-template-columns: auto 1fr; } }
+</style>

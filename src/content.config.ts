@@ -14,14 +14,14 @@ const dateOrPlaceholder = z.string().refine((value) => (
 
 const articles = defineCollection({
   loader: glob({ pattern: 'articles/**/*.md', base: './src/content' }),
-  schema: z.object({
+  schema: ({ image }) => z.object({
     title: z.string().min(1),
     description: z.string().min(1).max(155),
     author: z.object({
       name: z.string().min(1),
       jobTitle: z.string().min(1),
       teamSlug: z.string().min(1),
-      photo: z.string().min(1),
+      photo: image(),
     }),
     datePublished: dateOrPlaceholder,
     dateModified: dateOrPlaceholder,

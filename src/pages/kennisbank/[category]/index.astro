@@ -1,0 +1,48 @@
+---
+import { getCollection } from 'astro:content';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import { breadcrumbSchema } from '../../../utils/structured-data';
+
+export async function getStaticPaths() {
+  const categories = {
+    seo: { name: 'SEO', description: 'Uitleg over organische vindbaarheid, techniek en content.' },
+    geo: { name: 'GEO', description: 'Inzichten over vindbaarheid in AI-zoekervaringen.' },
+    webdesign: { name: 'Webdesign', description: 'Praktische kennis over ontwerp, toegankelijkheid en websites.' },
+  };
+  return Object.entries(categories).map(([category, details]) => ({ params: { category }, props: { category, details } }));
+}
+
+const { category, details } = Astro.props;
+const articles = await getCollection('articles', ({ data }) => data.category === category && !data.draft);
+const crumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Kennisbank', href: '/kennisbank/' },
+  { label: details.name, href: `/kennisbank/${category}/` },
+];
+const structuredData = breadcrumbSchema(crumbs);
+---
+
+<SiteLayout title={`${details.name} kennisbank | CF Media`} description={details.description} canonical={`https://www.cfmedia.nl/kennisbank/${category}/`} structuredData={structuredData}>
+  <Breadcrumbs items={crumbs} />
+  <header class="container page-hero">
+    <p class="eyebrow">Kennisbank · {details.name}</p>
+    <h1>{details.name}</h1>
+    <p>{details.description}</p>
+  </header>
+  <section class="container article-list" aria-label={`Artikelen over ${details.name}`}>
+    {articles.length ? articles.map((article) => <article><p class="eyebrow">{details.name}</p><h2><a href={`/kennisbank/${category}/${article.id.split('/').at(-1)}/`}>{article.data.title}</a></h2><p>{article.data.description}</p></article>) : <p class="empty-state">Er zijn nog geen gepubliceerde artikelen in deze categorie.</p>}
+  </section>
+</SiteLayout>
+
+<style>
+  .page-hero { padding-block: 4rem 3rem; }
+  h1 { margin: 0.75rem 0; font-size: clamp(3rem, 7vw, 6rem); line-height: 1; }
+  .page-hero > p:last-child { max-width: 44rem; color: var(--muted); font-size: 1.15rem; line-height: 1.65; }
+  .article-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; padding-block: 1rem 6rem; }
+  article { padding-top: 1rem; border-top: 1px solid var(--line); }
+  h2 { margin: 0.5rem 0; font-size: 1.5rem; }
+  h2 a { text-decoration: none; }
+  article > p:last-child, .empty-state { color: var(--muted); line-height: 1.65; }
+  @media (max-width: 600px) { .article-list { grid-template-columns: 1fr; } }
+</style>
