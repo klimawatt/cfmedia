@@ -1,0 +1,19 @@
+---
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { breadcrumbSchema } from '../../utils/structured-data';
+
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Contact', href: '/contact/' }, { label: 'Bedankt', href: '/contact/bedankt/' }];
+const structuredData = breadcrumbSchema(crumbs);
+---
+
+<SiteLayout title="Bedankt voor je bericht | CF Media" description="Je bericht is verstuurd naar CF Media." canonical="https://www.cfmedia.nl/contact/bedankt/" structuredData={structuredData}>
+  <Breadcrumbs items={crumbs} />
+  <section class="container thank-you"><p class="eyebrow">Bericht verstuurd</p><h1>Dank je wel.</h1><p>Je bericht is ontvangen. We nemen contact met je op via het e-mailadres dat je hebt ingevuld.</p><a class="button-primary" href="/">Terug naar de homepagina <span aria-hidden="true">↗</span></a></section>
+</SiteLayout>
+
+<style>
+  .thank-you { min-height: 58vh; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-block: 4rem; }
+  h1 { margin: 0.75rem 0; font-size: clamp(3rem, 7vw, 6rem); }
+  .thank-you p:not(.eyebrow) { max-width: 38rem; margin-bottom: 2rem; color: var(--muted); font-size: 1.15rem; line-height: 1.65; }
+</style>

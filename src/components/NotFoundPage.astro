@@ -1,0 +1,21 @@
+---
+import Breadcrumbs from './Breadcrumbs.astro';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { breadcrumbSchema } from '../utils/structured-data';
+
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Pagina niet gevonden', href: '/404/' }];
+const structuredData = breadcrumbSchema(crumbs);
+---
+
+<SiteLayout title="Pagina niet gevonden | CF Media" description="Deze pagina bestaat niet of is verplaatst. Ga naar diensten, cases, kennisbank of neem contact op met CF Media." canonical="https://www.cfmedia.nl/404/" structuredData={structuredData}>
+  <Breadcrumbs items={crumbs} />
+  <section class="container not-found"><p class="eyebrow">404 · Pagina niet gevonden</p><h1>Deze pagina is er niet.</h1><p>Misschien is de URL veranderd. Via deze pagina vind je snel een andere plek.</p><nav aria-label="Belangrijke pagina’s"><a href="/diensten/">Diensten</a><a href="/cases/">Cases</a><a href="/kennisbank/">Kennisbank</a><a href="/contact/">Contact</a></nav><a class="button-primary" href="/">Naar de homepagina <span aria-hidden="true">↗</span></a></section>
+</SiteLayout>
+
+<style>
+  .not-found { min-height: 62vh; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-block: 4rem; }
+  h1 { max-width: 12ch; margin: 0.75rem 0; font-size: clamp(3rem, 7vw, 6rem); line-height: 1; }
+  .not-found > p:not(.eyebrow) { max-width: 40rem; color: var(--muted); font-size: 1.1rem; line-height: 1.6; }
+  nav { display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; margin-block: 1.5rem 2rem; }
+  nav a { color: var(--green); font-weight: 700; text-underline-offset: 0.2em; }
+</style>

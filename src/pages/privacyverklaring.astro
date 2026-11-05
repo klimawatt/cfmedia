@@ -1,0 +1,34 @@
+---
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { breadcrumbSchema } from '../utils/structured-data';
+
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Privacyverklaring', href: '/privacyverklaring/' }];
+const structuredData = breadcrumbSchema(crumbs);
+---
+
+<SiteLayout title="Privacyverklaring | CF Media" description="Lees welke gegevens het contactformulier van CF Media vraagt en vul de bedrijfs- en bewaargegevens aan voordat de verklaring wordt gepubliceerd." canonical="https://www.cfmedia.nl/privacyverklaring/" structuredData={structuredData}>
+  <Breadcrumbs items={crumbs} />
+  <header class="container page-hero"><p class="eyebrow">Privacy</p><h1>Privacyverklaring</h1><p>Deze verklaring beschrijft de gegevens die je via het contactformulier deelt. Vul de gemarkeerde bedrijfs- en verwerkingsgegevens aan en laat de tekst controleren vóór publicatie.</p></header>
+  <article class="container policy">
+    <section><h2>Wie is verantwoordelijk?</h2><p>Verwerkingsverantwoordelijke: CF Media, [ADRES INVULLEN], bereikbaar via [E-MAIL INVULLEN]. KvK: [NUMMER INVULLEN].</p></section>
+    <section><h2>Welke gegevens verwerken we?</h2><p>Als je het contactformulier verstuurt, verwerken we je naam, e-mailadres, eventueel je website en de inhoud van je bericht. Vul hier eventuele andere gegevensbronnen in: [GEGEVENSBRONNEN INVULLEN].</p></section>
+    <section><h2>Waarom verwerken we die gegevens?</h2><p>We gebruiken de formuliergegevens om je vraag te lezen en erop te reageren. Beschrijf hier de toepasselijke rechtsgrond en eventuele aanvullende doelen na juridische controle: [RECHTSGROND EN DOELEN CONTROLEREN].</p></section>
+    <section><h2>Hoe lang bewaren we gegevens?</h2><p>Bewaartermijn: [BEWAARTERMIJN INVULLEN]. Verwijder gegevens zodra ze niet meer nodig zijn voor het doel waarvoor je ze hebt gedeeld, rekening houdend met eventuele wettelijke verplichtingen.</p></section>
+    <section><h2>Met wie delen we gegevens?</h2><p>Op Netlify wordt het formulier verwerkt via Netlify Forms. Vul de gebruikte hosting- en formulierverwerkers aan en controleer de toepasselijke afspraken: [VERWERKERS EN DOORGIFTE INVULLEN].</p></section>
+    <section><h2>Welke rechten heb je?</h2><p>Je kunt vragen om inzage, correctie of verwijdering van je persoonsgegevens en bezwaar maken tegen verwerking waar dat van toepassing is. Neem contact op via [E-MAIL INVULLEN]. Je kunt ook een klacht indienen bij de Autoriteit Persoonsgegevens.</p></section>
+    <section><h2>Cookies en wijzigingen</h2><p>Beschrijf hier eventuele cookies, analysetools en de datum waarop deze verklaring voor het laatst is bijgewerkt: [COOKIES CONTROLEREN] · [DATUM INVULLEN].</p></section>
+    <p class="notice">Deze pagina bevat juridische invulvelden. Laat de inhoud controleren op de uiteindelijke hosting, formulieren en gegevensverwerking.</p>
+  </article>
+</SiteLayout>
+
+<style>
+  .page-hero { padding-block: 4rem 2rem; }
+  h1 { margin: 0.75rem 0; font-size: clamp(2.8rem, 6vw, 5.5rem); line-height: 1.02; }
+  .page-hero > p:last-child { max-width: 50rem; color: var(--muted); font-size: 1.1rem; line-height: 1.65; }
+  .policy { max-width: 54rem; padding-bottom: 6rem; }
+  section { padding-block: 1.3rem; border-top: 1px solid var(--line); }
+  h2 { margin: 0; font-size: 1.35rem; }
+  section p { color: var(--muted); line-height: 1.7; }
+  .notice { margin-top: 2rem; padding: 1rem; border-left: 3px solid var(--coral); background: var(--surface); line-height: 1.6; }
+</style>

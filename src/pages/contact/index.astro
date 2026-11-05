@@ -1,0 +1,58 @@
+---
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { breadcrumbSchema } from '../../utils/structured-data';
+
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Contact', href: '/contact/' }];
+const structuredData = breadcrumbSchema(crumbs);
+---
+
+<SiteLayout title="Contact | CF Media" description="Neem contact op met CF Media over SEO, GEO of webdesign. Deel je vraag via het formulier of bekijk onze contactgegevens." canonical="https://www.cfmedia.nl/contact/" structuredData={structuredData}>
+  <Breadcrumbs items={crumbs} />
+  <header class="container page-hero">
+    <p class="eyebrow">Contact</p>
+    <h1>Vertel waar je aan werkt.</h1>
+    <p>Deel je vraag over SEO, GEO of webdesign. We gebruiken je gegevens om op je bericht te reageren.</p>
+  </header>
+  <section class="container contact-layout">
+    <form name="cfmedia-contact" method="POST" action="/contact/bedankt/" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="cfmedia-contact" />
+      <p class="honeypot"><label>Niet invullen <input name="bot-field" /></label></p>
+      <div class="field"><label for="name">Naam <span aria-hidden="true">*</span></label><input id="name" name="name" type="text" autocomplete="name" maxlength="120" required /></div>
+      <div class="field"><label for="email">E-mailadres <span aria-hidden="true">*</span></label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required /></div>
+      <div class="field"><label for="website">Website</label><input id="website" name="website" type="url" autocomplete="url" inputmode="url" placeholder="https://" maxlength="2048" /></div>
+      <div class="field"><label for="message">Bericht <span aria-hidden="true">*</span></label><textarea id="message" name="message" rows="6" maxlength="5000" required></textarea></div>
+      <p class="form-note">Velden met een ster zijn verplicht. Lees hoe we je gegevens verwerken in de <a href="/privacyverklaring/">privacyverklaring</a>.</p>
+      <button class="button-primary" type="submit">Verstuur bericht <span aria-hidden="true">↗</span></button>
+    </form>
+    <aside class="contact-details" aria-labelledby="contact-details-heading">
+      <p class="eyebrow">Gegevens</p><h2 id="contact-details-heading">CF Media</h2>
+      <dl><div><dt>E-mail</dt><dd>[E-MAIL INVULLEN]</dd></div><div><dt>Telefoon</dt><dd>[TELEFOON INVULLEN]</dd></div><div><dt>Adres</dt><dd>[ADRES INVULLEN]</dd></div><div><dt>KvK</dt><dd>[NUMMER INVULLEN]</dd></div></dl>
+    </aside>
+  </section>
+</SiteLayout>
+
+<style>
+  .page-hero { padding-block: 4rem 3rem; }
+  h1 { max-width: 13ch; margin: 0.75rem 0; font-size: clamp(2.8rem, 6vw, 5.5rem); line-height: 1.02; }
+  .page-hero > p:last-child { max-width: 42rem; color: var(--muted); font-size: 1.15rem; line-height: 1.6; }
+  .contact-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(14rem, 0.7fr); gap: clamp(2rem, 7vw, 6rem); padding-bottom: 6rem; }
+  form { min-width: 0; }
+  .field { display: grid; gap: 0.45rem; margin-bottom: 1.25rem; }
+  label { font-weight: 700; }
+  label span { color: #b63828; }
+  input, textarea { width: 100%; min-width: 0; padding: 0.75rem; border: 1px solid var(--line); border-radius: 0; background: var(--surface); color: var(--ink); }
+  input { min-height: 3rem; }
+  textarea { min-height: 10rem; resize: vertical; }
+  .form-note { max-width: 42rem; margin-block: 1.5rem; color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+  .form-note a { color: var(--green); text-underline-offset: 0.2em; }
+  .button-primary { cursor: pointer; }
+  .contact-details { align-self: start; padding: 1.5rem; background: var(--green-bright); }
+  .contact-details h2 { margin: 0.5rem 0 1.5rem; font-size: 1.5rem; }
+  dl { margin: 0; }
+  dl > div { padding-block: 0.8rem; border-top: 1px solid #17684450; }
+  dt { color: var(--muted); font-size: 0.85rem; }
+  dd { margin: 0.3rem 0 0; font-weight: 700; overflow-wrap: anywhere; }
+  .honeypot { position: absolute; left: -9999px; }
+  @media (max-width: 700px) { .contact-layout { grid-template-columns: 1fr; } }
+</style>
