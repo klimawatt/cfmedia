@@ -1,15 +1,17 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCases } from '../../lib/cases';
+import { seoProps } from '../../lib/cms';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import { breadcrumbSchema } from '../../utils/structured-data';
 
 export async function getStaticPaths() {
-  const cases = await getCollection('cases');
+  const cases = await getCases({ includeDrafts: import.meta.env.DEV });
   return cases.map((item) => ({ params: { slug: item.id.split('/').at(-1)! }, props: { item } }));
 }
 
 const { item } = Astro.props;
+const isDraftPreview = item.data.draft;
 const slug = item.id.split('/').at(-1)!;
 const crumbs = [
   { label: 'Home', href: '/' },
@@ -17,11 +19,13 @@ const crumbs = [
   { label: item.data.title, href: `/cases/${slug}/` },
 ];
 const structuredData = breadcrumbSchema(crumbs);
+const seo = seoProps(item.seo, { title: `${item.data.title} | CF Media`, description: item.data.description, canonical: `https://www.cfmedia.nl/cases/${slug}/` });
 ---
 
-<SiteLayout title="Case-opzet | CF Media" description={item.data.description} canonical={`https://www.cfmedia.nl/cases/${slug}/`} structuredData={structuredData}>
+<SiteLayout title={seo.title} description={seo.description} canonical={seo.canonical} noindex={seo.noindex} image={seo.image} structuredData={structuredData}>
   <Breadcrumbs items={crumbs} />
   <header class="container page-hero">
+    {isDraftPreview && <p class="draft-banner">Conceptpreview / niet gepubliceerd</p>}
     <p class="eyebrow">Case · {item.data.serviceTags.length ? item.data.serviceTags.join(' · ') : 'Dienst invullen'}</p>
     <h1>{item.data.title}</h1>
     <p>{item.data.description}</p>
@@ -30,7 +34,7 @@ const structuredData = breadcrumbSchema(crumbs);
     <section><h2>De vraag</h2><p>{item.data.problem}</p></section>
     <section><h2>De aanpak</h2><p>{item.data.approach}</p></section>
     <section><h2>Het resultaat</h2><p>{item.data.result}</p></section>
-    <p class="notice">Deze pagina bevat invulvelden. Vervang de placeholders en controleer toestemming voordat je de case publiceert.</p>
+    {isDraftPreview && <p class="notice">Deze case is een invulopzet. Vervang de placeholders en controleer toestemming voordat je de case publiceert.</p>}
     <a class="text-link" href="/diensten/">Bekijk de diensten van CF Media <span aria-hidden="true">↗</span></a>
   </article>
 </SiteLayout>
@@ -39,6 +43,7 @@ const structuredData = breadcrumbSchema(crumbs);
   .page-hero { padding-block: 4rem 3rem; }
   h1 { max-width: 16ch; margin: 0.75rem 0; font-size: var(--type-h1); line-height: 1; overflow-wrap: anywhere; }
   .page-hero > p:last-child { max-width: 44rem; color: var(--muted); font-size: 1.15rem; line-height: 1.6; }
+  .draft-banner { display: inline-block; margin: 0 0 1rem; padding: 0.4rem 0.65rem; border-left: 3px solid var(--accent); background: var(--surface-soft); color: var(--ink); font-size: 0.75rem; font-weight: 700; }
   .case-content { max-width: 50rem; padding-bottom: 6rem; }
   section { padding-block: 1.5rem; border-top: 1px solid var(--line); }
   h2 { margin: 0 0 0.7rem; font-size: 1.4rem; }

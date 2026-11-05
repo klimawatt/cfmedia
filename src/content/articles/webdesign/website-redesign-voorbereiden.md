@@ -4,8 +4,7 @@ description: "Een goed website-redesign begint met inzicht in bezoekers, inhoud 
 author:
   name: "[NAAM AUTEUR INVULLEN]"
   jobTitle: "[FUNCTIE INVULLEN]"
-  teamSlug: "teamlid-invullen"
-  photo: "../../../assets/team-placeholder.svg"
+  photo: "../../../assets/fabian-clemens.jpg"
 datePublished: "[DATUM INVULLEN]"
 dateModified: "[DATUM INVULLEN]"
 category: "webdesign"

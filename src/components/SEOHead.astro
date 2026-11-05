@@ -4,6 +4,7 @@ interface Props {
   description: string;
   canonical: string;
   image?: string;
+  noindex?: boolean;
   structuredData?: Record<string, unknown> | Record<string, unknown>[];
 }
 
@@ -12,6 +13,7 @@ const {
   description,
   canonical,
   image = '/images/og-default.svg',
+  noindex = false,
   structuredData = [],
 } = Astro.props;
 const imageUrl = new URL(image, Astro.site).href;
@@ -22,6 +24,7 @@ const serialize = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u00
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="CF Media" />
 <meta property="og:title" content={title} />

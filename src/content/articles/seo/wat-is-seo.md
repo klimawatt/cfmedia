@@ -4,8 +4,7 @@ description: "SEO maakt je website beter vindbaar in organische zoekresultaten. 
 author:
   name: "[NAAM AUTEUR INVULLEN]"
   jobTitle: "[FUNCTIE INVULLEN]"
-  teamSlug: "teamlid-invullen"
-  photo: "../../../assets/team-placeholder.svg"
+  photo: "../../../assets/fabian-clemens.jpg"
 cover: "../../../assets/seo-dashboard.jpg"
 coverAlt: "Laptop met een analyticsdashboard voor websiteverkeer"
 datePublished: "[DATUM INVULLEN]"

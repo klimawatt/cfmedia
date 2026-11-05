@@ -11,5 +11,5 @@ Belangrijke pagina's:
 - [Cases](https://www.cfmedia.nl/cases/)
 - [Kennisbank](https://www.cfmedia.nl/kennisbank/)
 - [Tarieven](https://www.cfmedia.nl/tarieven/)
-- [Over ons](https://www.cfmedia.nl/over-ons/)
+- [Over mij](https://www.cfmedia.nl/over-mij/)
 - [Contact](https://www.cfmedia.nl/contact/)

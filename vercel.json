@@ -1,0 +1,6 @@
+{
+  "redirects": [
+    { "source": "/over-ons", "destination": "/over-mij/", "permanent": true },
+    { "source": "/over-ons/:path*", "destination": "/over-mij/", "permanent": true }
+  ]
+}

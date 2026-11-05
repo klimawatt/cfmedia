@@ -9,7 +9,7 @@ export default defineConfig({
   output: 'static',
   integrations: [
     mdx(),
-    sitemap({ filter: (page) => !page.endsWith('/404/') && !page.endsWith('/contact/bedankt/') }),
+    sitemap({ filter: (page) => !page.endsWith('/404/') && !page.endsWith('/contact/bedankt/') && !page.endsWith('/redactie/') }),
   ],
   vite: {
     plugins: [tailwindcss()],

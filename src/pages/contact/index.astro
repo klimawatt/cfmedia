@@ -27,7 +27,7 @@ const structuredData = breadcrumbSchema(crumbs);
     </form>
     <aside class="contact-details" aria-labelledby="contact-details-heading">
       <p class="eyebrow">Gegevens</p><h2 id="contact-details-heading">CF Media</h2>
-      <dl><div><dt>E-mail</dt><dd>[E-MAIL INVULLEN]</dd></div><div><dt>Telefoon</dt><dd>[TELEFOON INVULLEN]</dd></div><div><dt>Adres</dt><dd>[ADRES INVULLEN]</dd></div><div><dt>KvK</dt><dd>[NUMMER INVULLEN]</dd></div></dl>
+      <dl><div><dt>E-mail</dt><dd><a href="mailto:info@cfmedia.nl">info@cfmedia.nl</a></dd></div><div><dt>Telefoon</dt><dd>[TELEFOON INVULLEN]</dd></div><div><dt>Adres</dt><dd>Ieplaan 54<br />2822 EC Rijswijk</dd></div><div><dt>KvK</dt><dd>81830033</dd></div></dl>
     </aside>
   </section>
 </SiteLayout>
@@ -40,7 +40,7 @@ const structuredData = breadcrumbSchema(crumbs);
   form { min-width: 0; }
   .field { display: grid; gap: 0.45rem; margin-bottom: 1.25rem; }
   label { font-weight: 700; }
-  label span { color: #b63828; }
+  label span { color: var(--accent); }
   input, textarea { width: 100%; min-width: 0; padding: 0.75rem; border: 1px solid var(--line); border-radius: 0; background: var(--surface); color: var(--ink); }
   input { min-height: 3rem; }
   textarea { min-height: 10rem; resize: vertical; }
@@ -50,9 +50,10 @@ const structuredData = breadcrumbSchema(crumbs);
   .contact-details { align-self: start; padding: 1.5rem; background: var(--green-bright); }
   .contact-details h2 { margin: 0.5rem 0 1.5rem; font-size: 1.5rem; }
   dl { margin: 0; }
-  dl > div { padding-block: 0.8rem; border-top: 1px solid #17684450; }
+  dl > div { padding-block: 0.8rem; border-top: 1px solid var(--line); }
   dt { color: var(--muted); font-size: 0.85rem; }
   dd { margin: 0.3rem 0 0; font-weight: 700; overflow-wrap: anywhere; }
+  dd a { color: inherit; text-underline-offset: 0.15em; }
   .honeypot { position: absolute; left: -9999px; }
   @media (max-width: 700px) { .contact-layout { grid-template-columns: 1fr; } }
 </style>

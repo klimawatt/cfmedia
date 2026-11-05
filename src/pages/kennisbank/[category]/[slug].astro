@@ -1,13 +1,16 @@
 ---
 import { Image } from 'astro:assets';
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import GoogleFollowBanner from '../../../components/GoogleFollowBanner.astro';
 import SiteLayout from '../../../layouts/SiteLayout.astro';
 import { allServicePages } from '../../../data/services';
+import { getArticles } from '../../../lib/articles';
+import { seoProps } from '../../../lib/cms';
 import { breadcrumbSchema } from '../../../utils/structured-data';
 
 export async function getStaticPaths() {
-  const articles = await getCollection('articles', ({ data }) => !data.draft || import.meta.env.DEV);
+  const articles = await getArticles({ includeDrafts: import.meta.env.DEV });
   return articles.map((article) => ({
     params: { category: article.data.category, slug: article.id.split('/').at(-1)! },
     props: { article },
@@ -17,7 +20,7 @@ export async function getStaticPaths() {
 const { article } = Astro.props;
 const isDraftPreview = article.data.draft;
 const slug = article.id.split('/').at(-1)!;
-const { Content } = await render(article);
+const Content = article.entry ? (await render(article.entry)).Content : undefined;
 const crumbs = [
   { label: 'Home', href: '/' },
   { label: 'Kennisbank', href: '/kennisbank/' },
@@ -44,7 +47,11 @@ const articleSchema = {
     name: article.data.author.name,
     jobTitle: article.data.author.jobTitle,
     image: new URL(article.data.author.photo.src, Astro.site).href,
-    url: new URL(`/over-ons/${article.data.author.teamSlug}/`, Astro.site).href,
+    url: new URL('/over-mij/', Astro.site).href,
+    sameAs: [
+      'https://www.linkedin.com/in/fabian-clemens-0675bbaa/',
+      'https://www.frankwatching.com/archive/author/fabian-clemens/',
+    ],
   },
   publisher: { '@type': 'Organization', name: 'CF Media', url: 'https://www.cfmedia.nl/' },
   mainEntityOfPage: canonical,
@@ -53,9 +60,10 @@ const structuredData = [
   breadcrumbSchema(crumbs),
   ...(!isDraftPreview ? [articleSchema] : []),
 ];
+const seo = seoProps(article.seo, { title: `${article.data.title} | CF Media`, description: article.data.description, canonical });
 ---
 
-<SiteLayout title={`${article.data.title} | CF Media`} description={article.data.description} canonical={canonical} structuredData={structuredData}>
+<SiteLayout title={seo.title} description={seo.description} canonical={seo.canonical} noindex={seo.noindex} image={seo.image} structuredData={structuredData}>
   <div class="container article-shell"><Breadcrumbs items={crumbs} /></div>
   <header class="container article-header">
     <div class="article-heading">
@@ -66,25 +74,26 @@ const structuredData = [
     </div>
     {article.data.cover && <figure class="article-cover"><Image src={article.data.cover} alt={article.data.coverAlt ?? ''} width={article.data.cover.width} height={article.data.cover.height} format="webp" sizes="(max-width: 760px) 100vw, 76rem" loading="eager" /><figcaption>{article.data.coverAlt}</figcaption></figure>}
     <div class="author-strip">
-      <div class="byline"><Image src={article.data.author.photo} alt={`Portret van ${article.data.author.name}`} width={56} height={56} /><div><span>Geschreven door <a href={`/over-ons/${article.data.author.teamSlug}/`}>{article.data.author.name}</a></span><span>{article.data.author.jobTitle}</span></div></div>
+      <div class="byline"><Image src={article.data.author.photo} alt={`Portret van ${article.data.author.name}`} width={56} height={56} /><div><span>Geschreven door <a href="/over-mij/">{article.data.author.name}</a></span><span>{article.data.author.jobTitle}</span></div></div>
       <div class="date-meta"><span>Gepubliceerd <time datetime={publishedDate}>{formatDate(article.data.datePublished)}</time></span><span>Bijgewerkt <time datetime={modifiedDate}>{formatDate(article.data.dateModified)}</time></span></div>
     </div>
   </header>
   <article class="article-body">
-    <Content />
+    {article.html ? <Fragment set:html={article.html} /> : Content && <Content />}
     <section class="author-bio" aria-label="Over de auteur">
       <Image src={article.data.author.photo} alt={`Portret van ${article.data.author.name}`} width={80} height={80} />
-      <div><p class="eyebrow">Over de auteur</p><h2>{article.data.author.name}</h2><p>{article.data.author.jobTitle}</p><a href={`/over-ons/${article.data.author.teamSlug}/`}>Bekijk het profiel <span aria-hidden="true">↗</span></a></div>
+      <div><p class="eyebrow">Over de auteur</p><h2>{article.data.author.name}</h2><p>{article.data.author.jobTitle}</p><a href="/over-mij/">Bekijk het profiel <span aria-hidden="true">↗</span></a></div>
     </section>
     {services.length > 0 && <nav class="related-services" aria-label="Gerelateerde diensten"><span class="eyebrow">Verder lezen</span><strong>Werk verder aan {article.data.category}</strong><ul>{services.map((service) => <li><a href={`/diensten/${service.slug}/`}>{service.name} <span aria-hidden="true">↗</span></a></li>)}</ul></nav>}
   </article>
+  <GoogleFollowBanner />
 </SiteLayout>
 
 <style>
   .article-shell { border-bottom: 1px solid var(--line); }
   .article-header { padding-block: 2.5rem 0; }
   .article-heading { max-width: 64rem; margin-inline: auto; }
-  .draft-banner { display: inline-block; margin: 0 0 1rem; padding: 0.4rem 0.65rem; background: #ffddd3; color: #17231d; font-size: 0.75rem; font-weight: 700; }
+  .draft-banner { display: inline-block; margin: 0 0 1rem; padding: 0.4rem 0.65rem; border-left: 3px solid var(--accent); background: var(--surface-soft); color: var(--ink); font-size: 0.75rem; font-weight: 700; }
   .category-label { display: flex; align-items: center; gap: 0.55rem; margin: 0 0 1rem; color: var(--green); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
   .category-dot { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--coral); }
   h1 { max-width: 18ch; margin: 0.7rem 0 1rem; font-size: var(--type-h1); line-height: 1.02; }

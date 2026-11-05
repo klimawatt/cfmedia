@@ -4,8 +4,7 @@ description: "GEO helpt informatie over je organisatie vindbaar en bruikbaar te 
 author:
   name: "[NAAM AUTEUR INVULLEN]"
   jobTitle: "[FUNCTIE INVULLEN]"
-  teamSlug: "teamlid-invullen"
-  photo: "../../../assets/team-placeholder.svg"
+  photo: "../../../assets/fabian-clemens.jpg"
 datePublished: "[DATUM INVULLEN]"
 dateModified: "[DATUM INVULLEN]"
 category: "geo"

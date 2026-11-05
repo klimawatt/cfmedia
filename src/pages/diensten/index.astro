@@ -4,8 +4,11 @@ import { Image } from 'astro:assets';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import seoDashboard from '../../assets/seo-dashboard.jpg';
-import { services } from '../../data/services';
+import { applyServiceOverrides } from '../../data/services';
+import { getOverrideMap } from '../../lib/cms';
 import { breadcrumbSchema } from '../../utils/structured-data';
+
+const services = applyServiceOverrides(await getOverrideMap('service'));
 
 const crumbs = [{ label: 'Home', href: '/' }, { label: 'Diensten', href: '/diensten/' }];
 const structuredData = breadcrumbSchema(crumbs);
@@ -26,7 +29,7 @@ const structuredData = breadcrumbSchema(crumbs);
       </a>
     ))}
   </section>
-  <section class="case-band"><div class="container case-note"><div><p class="eyebrow">Uit de praktijk</p><h2>Goed werk vraagt om echte voorbeelden.</h2><p>Cases verschijnen hier na toestemming en controle van de inhoud.</p></div><a class="case-placeholder" href="/cases/case-invullen/"><span>CASE / 001</span><strong>[CASE: klantnaam + resultaat invullen]</strong><span>Bekijk de case-opzet <ArrowUpRight size={17} aria-hidden="true" /></span></a></div></section>
+  <section class="case-band"><div class="container case-note"><div><p class="eyebrow">Uit de praktijk</p><h2>Een paar heldere cases zijn genoeg om te beginnen.</h2><p>We delen projecten zodra de aanpak en klantinformatie zijn goedgekeurd.</p></div><a class="case-placeholder" href="/cases/"><span>CASES / CF MEDIA</span><strong>Bekijk hoe we werken aan SEO, GEO en webdesign.</strong><span>Bekijk de cases <ArrowUpRight size={17} aria-hidden="true" /></span></a></div></section>
 </SiteLayout>
 
 <style>
@@ -38,11 +41,9 @@ const structuredData = breadcrumbSchema(crumbs);
   .hero-image figcaption { display: flex; justify-content: space-between; padding: 0.8rem 1rem; font-size: 0.78rem; font-weight: 700; }
   .service-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8rem; padding-bottom: 5rem; }
   .service-card { position: relative; display: flex; min-width: 0; min-height: 25rem; flex-direction: column; justify-content: space-between; overflow: hidden; padding: 1.2rem; color: var(--ink); text-decoration: none; }
-  .tone-0 { background: #dcecff; }
-  .tone-1 { background: #c8ec7c; }
-  .tone-2 { background: #ffddd3; }
+  .tone-0, .tone-1, .tone-2 { border-top: 3px solid var(--accent); background: var(--surface-soft); }
   .service-number { position: relative; z-index: 1; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; }
-  .service-orbit { position: absolute; top: 3.2rem; right: -0.5rem; color: #17231d16; font-size: 8rem; font-weight: 800; line-height: 1; transform: rotate(90deg); transform-origin: top right; }
+  .service-orbit { position: absolute; top: 3.2rem; right: -0.5rem; color: color-mix(in srgb, var(--ink) 8%, transparent); font-size: 8rem; font-weight: 800; line-height: 1; transform: rotate(90deg); transform-origin: top right; }
   .service-card-content { position: relative; z-index: 1; }
   .service-card h2 { margin: 0 0 0.6rem; font-size: 2rem; }
   .service-summary { display: block; max-width: 28ch; min-height: 4rem; line-height: 1.55; }
@@ -51,7 +52,7 @@ const structuredData = breadcrumbSchema(crumbs);
   .case-note { display: grid; grid-template-columns: 0.85fr 1.15fr; align-items: center; gap: 3rem; }
   .case-note h2 { max-width: 14ch; margin: 0.6rem 0; font-size: 2.4rem; line-height: 1.1; }
   .case-note > div > p:last-child { max-width: 35rem; line-height: 1.6; }
-  .case-placeholder { display: flex; min-height: 15rem; flex-direction: column; justify-content: space-between; padding: 1.3rem; background: var(--case-bg, #19382c); color: #f5f7f2; text-decoration: none; }
+  .case-placeholder { display: flex; min-height: 15rem; flex-direction: column; justify-content: space-between; padding: 1.3rem; background: var(--night); color: var(--night-ink); text-decoration: none; }
   .case-placeholder > span { display: flex; align-items: center; gap: 0.45rem; font-size: 0.78rem; font-weight: 700; }
   .case-placeholder strong { max-width: 20ch; font-size: 1.7rem; }
   @media (max-width: 760px) { .page-hero { grid-template-columns: 1fr; gap: 1.5rem; } .service-list { grid-template-columns: 1fr; } .service-card { min-height: 18rem; } .service-orbit { top: 2.4rem; font-size: 6rem; } .case-note { grid-template-columns: 1fr; gap: 1.5rem; } }

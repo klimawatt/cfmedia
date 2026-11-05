@@ -1,0 +1,79 @@
+---
+import { Image } from 'astro:assets';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import fabianPortrait from '../assets/fabian-clemens.jpg';
+import { pageDefaults } from '../data/pages';
+import { getPageContent, seoProps } from '../lib/cms';
+import { breadcrumbSchema } from '../utils/structured-data';
+
+const c = await getPageContent('over-mij', pageDefaults['over-mij']);
+const name = c.name;
+const role = c.role;
+const biography = c.story;
+const profileLinks = c.links;
+const canonical = 'https://www.cfmedia.nl/over-mij/';
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Over mij', href: '/over-mij/' }];
+const structuredData = [breadcrumbSchema(crumbs), {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name,
+  jobTitle: role,
+  description: role,
+  image: new URL(fabianPortrait.src, Astro.site).href,
+  sameAs: profileLinks.map(({ href }) => href),
+  worksFor: { '@type': 'Organization', name: 'CF Media', url: 'https://www.cfmedia.nl/' },
+  url: canonical,
+}];
+const seo = seoProps(c.seo, { title: `Over ${name} | CF Media`, description: `Maak kennis met ${name}, ${role.toLowerCase()}.`, canonical });
+---
+
+<SiteLayout title={seo.title} description={seo.description} canonical={seo.canonical} noindex={seo.noindex} image={seo.image} structuredData={structuredData}>
+  <Breadcrumbs items={crumbs} />
+  <section class="profile-hero" aria-labelledby="profile-title">
+    <div class="container profile-grid">
+      <figure class="portrait">
+        <Image src={fabianPortrait} alt={`Portret van ${name}, ${role.toLowerCase()}`} width={320} height={320} format="webp" sizes="(max-width: 700px) 70vw, 22rem" />
+        <figcaption>{name} / {role}</figcaption>
+      </figure>
+      <div class="profile-copy">
+        <p class="eyebrow">Over mij</p>
+        <h1 id="profile-title">{name}</h1>
+        <p class="role">{role}</p>
+        <p class="bio-intro">{c.intro}</p>
+        <div class="profile-links"><a class="profile-button" href="#mijn-verhaal">Lees mijn verhaal <span aria-hidden="true">↓</span></a>{profileLinks.map((link) => <a class="linkedin-link" href={link.href} target="_blank" rel="noopener noreferrer">{link.label} <span aria-hidden="true">↗</span></a>)}</div>
+      </div>
+    </div>
+  </section>
+  <section id="mijn-verhaal" class="container story-section">
+    <div><p class="eyebrow">Mijn verhaal</p><h2>{c.storyTitle}</h2></div>
+    <div class="story-copy">{biography.split(/\n\s*\n/).map((paragraph) => <p>{paragraph}</p>)}<div class="expertise">{c.expertise.map((item) => <span>{item}</span>)}</div></div>
+  </section>
+  <section class="profile-cta"><div class="container cta-inner"><div><p class="eyebrow">Samenwerken</p><h2>{c.ctaTitle}</h2></div><a class="button-primary" href="/contact/">Neem contact op <span aria-hidden="true">↗</span></a></div></section>
+</SiteLayout>
+
+<style>
+  .profile-hero { padding-block: 4rem 5rem; background: var(--night); color: var(--night-ink); }
+  .profile-grid { display: grid; grid-template-columns: minmax(15rem, 0.65fr) minmax(0, 1.35fr); align-items: center; gap: clamp(2.5rem, 7vw, 6rem); }
+  .portrait { position: relative; width: min(100%, 22rem); margin: 0; }
+  .portrait :global(img) { display: block; width: 100%; aspect-ratio: 1; border: 4px solid var(--accent); border-radius: 50%; object-fit: cover; }
+  .portrait figcaption { margin-top: 0.6rem; color: var(--night-muted); font-size: 0.75rem; text-align: center; }
+  .profile-copy .eyebrow { color: var(--accent-on-dark); }
+  h1 { margin: 0.5rem 0; font-size: var(--type-h1); line-height: 1; }
+  .role { margin: 0; color: var(--night-muted); font-size: 1.2rem; }
+  .bio-intro { max-width: 46rem; margin-block: 1.75rem; color: var(--night-muted); font-size: 1.12rem; line-height: 1.7; }
+  .profile-button { display: inline-flex; min-height: 3rem; align-items: center; gap: 1rem; padding: 0.75rem 1rem; background: var(--accent); color: var(--button-ink); font-weight: 700; text-decoration: none; }
+  .profile-button:hover { background: var(--accent-hover); }
+  .profile-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+  .linkedin-link { display: inline-flex; min-height: 3rem; align-items: center; gap: 0.6rem; padding: 0.75rem 1rem; border: 1px solid color-mix(in srgb, var(--night-ink) 35%, transparent); color: var(--night-ink); font-weight: 700; text-decoration: none; }
+  .linkedin-link:hover { border-color: var(--accent-on-dark); color: var(--accent-on-dark); }
+  .story-section { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 3rem; padding-block: 5rem; }
+  .story-section h2, .cta-inner h2 { max-width: 15ch; margin: 0.5rem 0; font-size: var(--type-h2); line-height: 1.08; }
+  .story-copy { max-width: 46rem; color: var(--muted); font-size: 1.08rem; line-height: 1.8; }
+  .expertise { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin-top: 1.5rem; color: var(--accent); font-size: 0.8rem; font-weight: 700; }
+  .expertise span + span::before { margin-right: 1.25rem; color: var(--line); content: '/'; }
+  .profile-cta { padding-block: 3.5rem; background: var(--surface-soft); }
+  .cta-inner { display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
+  .cta-inner h2 { font-size: var(--type-h2-medium); }
+  @media (max-width: 700px) { .profile-hero { padding-block: 3rem; } .profile-grid, .story-section { grid-template-columns: 1fr; gap: 2rem; } .portrait { width: min(70vw, 18rem); margin-inline: auto; } .cta-inner { align-items: flex-start; flex-direction: column; } }
+</style>

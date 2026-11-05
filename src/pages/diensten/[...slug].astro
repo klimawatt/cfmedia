@@ -6,16 +6,19 @@ import FaqList from '../../components/FaqList.astro';
 import ServiceContentBlocks from '../../components/ServiceContentBlocks.astro';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import seoDashboard from '../../assets/seo-dashboard.jpg';
-import { allServicePages, services, type ServiceHub, type ServicePage } from '../../data/services';
+import { applyServiceOverrides, services, type ServiceHub, type ServicePage } from '../../data/services';
+import { getOverrideMap, seoProps } from '../../lib/cms';
 import { breadcrumbSchema, faqSchema } from '../../utils/structured-data';
 
-export function getStaticPaths() {
-  return allServicePages.map((service) => ({ params: { slug: service.slug }, props: { service } }));
+export async function getStaticPaths() {
+  const resolved = applyServiceOverrides(await getOverrideMap('service'));
+  return resolved.flatMap((hub) => [hub, ...hub.subservices]).map((service) => ({ params: { slug: service.slug }, props: { service } }));
 }
 
 const service = Astro.props.service as ServicePage | ServiceHub;
 const isHub = (item: ServicePage | ServiceHub): item is ServiceHub => 'subservices' in item;
 const isServiceHub = isHub(service);
+const entryService = isServiceHub && ['seo', 'geo'].includes(service.slug) ? service.subservices[0] : undefined;
 const hub = services.find((item) => item.slug === service.hub)!;
 const crumbs = [
   { label: 'Home', href: '/' },
@@ -33,9 +36,10 @@ const serviceSchema = {
   provider: { '@type': 'Organization', name: 'CF Media', url: 'https://www.cfmedia.nl/' },
 };
 const structuredData = [breadcrumbSchema(crumbs), serviceSchema, ...(isServiceHub ? [faqSchema(service.faq)] : [])];
+const seo = seoProps(service.seo, { title: service.title, description: service.description, canonical: `https://www.cfmedia.nl/diensten/${service.slug}/` });
 ---
 
-<SiteLayout title={service.title} description={service.description} canonical={`https://www.cfmedia.nl/diensten/${service.slug}/`} structuredData={structuredData}>
+<SiteLayout title={seo.title} description={seo.description} canonical={seo.canonical} noindex={seo.noindex} image={seo.image} structuredData={structuredData}>
   <Breadcrumbs items={crumbs} />
   <header class:list={['container', 'page-hero', { 'hub-hero': isServiceHub }]}>
     <div class="hero-copy"><p class="eyebrow">CF Media / {hub.name}</p>
@@ -49,6 +53,12 @@ const structuredData = [breadcrumbSchema(crumbs), serviceSchema, ...(isServiceHu
       <aside class={`service-visual service-index ${service.slug}`} aria-label={`Onderdelen van ${service.name}`}><p class="eyebrow">{service.name} / IN DE PRAKTIJK</p><ul>{service.subservices.map((item, index) => <li><span>0{index + 1}</span><a href={`/diensten/${item.slug}/`}>{item.name}<ArrowUpRight size={16} aria-hidden="true" /></a></li>)}</ul><span class="index-signature">CF / {service.slug.toUpperCase()}</span></aside>
     ))}
   </header>
+
+  {entryService && <section class="container entry-service" aria-label={`${entryService.name}, instapdienst`}>
+    <div><p class="eyebrow">Een laagdrempelige eerste stap</p><h2>{entryService.name}</h2></div>
+    <p>{entryService.summary}</p>
+    <a class="text-link" href={`/diensten/${entryService.slug}/`}>Bekijk de audit <span aria-hidden="true">↗</span></a>
+  </section>}
 
   {isServiceHub ? (
     <>
@@ -83,6 +93,7 @@ const structuredData = [breadcrumbSchema(crumbs), serviceSchema, ...(isServiceHu
         <div><p class="eyebrow">Wat je krijgt</p><h2>Concreet en inzichtelijk</h2></div>
         <ul>{service.deliverables.map((item) => <li>{item}</li>)}</ul>
       </section>
+      {service.contentBlocks && service.contentBlocks.length > 0 && <ServiceContentBlocks blocks={service.contentBlocks} />}
       <section class="container faq-section"><p class="eyebrow">Veelgestelde vragen</p><h2>Over {service.name.toLowerCase()}</h2><FaqList questions={service.faq} /></section>
     </>
   )}
@@ -107,6 +118,11 @@ const structuredData = [breadcrumbSchema(crumbs), serviceSchema, ...(isServiceHu
   .service-index li > span { font-size: 0.75rem; font-weight: 700; }
   .service-index li a { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; color: inherit; font-weight: 700; text-decoration: none; }
   .index-signature { align-self: flex-end; margin-top: 1.25rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; }
+  .entry-service { display: grid; grid-template-columns: minmax(12rem, 0.8fr) minmax(0, 1.2fr) auto; align-items: center; gap: 1.25rem; margin-block: 0 3rem; padding: 1.25rem; border-left: 3px solid var(--accent); background: var(--surface-soft); }
+  .entry-service .eyebrow { margin: 0 0 0.3rem; }
+  .entry-service h2 { margin: 0; font-size: 1.25rem; }
+  .entry-service > p { margin: 0; color: var(--muted); line-height: 1.5; }
+  .entry-service .text-link { white-space: nowrap; }
   h1 { max-width: 18ch; margin: 0.8rem 0 1rem; font-size: var(--type-h1); line-height: 1.02; }
   .summary { max-width: 48rem; margin: 0; color: var(--muted); font-size: var(--type-lead); line-height: 1.6; }
   h2 { margin: 0.4rem 0 0.8rem; font-size: var(--type-h2-medium); line-height: 1.15; }
@@ -128,5 +144,5 @@ const structuredData = [breadcrumbSchema(crumbs), serviceSchema, ...(isServiceHu
   .faq-section h2 { margin-bottom: 2rem; }
   .service-cta { margin-block: 2rem 5rem; padding: clamp(1.5rem, 5vw, 4rem); background: var(--green-bright); }
   .service-cta h2 { max-width: 16ch; margin: 0 0 1.5rem; font-size: var(--type-h2); }
-  @media (max-width: 700px) { .hub-hero { grid-template-columns: 1fr; gap: 1.5rem; } .service-visual { min-height: 0; } .intro-grid, .detail-grid, .deliverables { grid-template-columns: 1fr; gap: 1.2rem; } .subservice-grid { grid-template-columns: 1fr; } .knowledge-link { align-items: flex-start; flex-direction: column; } }
+  @media (max-width: 700px) { .hub-hero { grid-template-columns: 1fr; gap: 1.5rem; } .service-visual { min-height: 0; } .entry-service { grid-template-columns: 1fr; gap: 0.6rem; } .entry-service .text-link { justify-self: start; } .intro-grid, .detail-grid, .deliverables { grid-template-columns: 1fr; gap: 1.2rem; } .subservice-grid { grid-template-columns: 1fr; } .knowledge-link { align-items: flex-start; flex-direction: column; } }
 </style>

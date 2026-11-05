@@ -4,8 +4,7 @@ description: "Een toegankelijke website werkt voor meer mensen. Begin met toetse
 author:
   name: "[NAAM AUTEUR INVULLEN]"
   jobTitle: "[FUNCTIE INVULLEN]"
-  teamSlug: "teamlid-invullen"
-  photo: "../../../assets/team-placeholder.svg"
+  photo: "../../../assets/fabian-clemens.jpg"
 datePublished: "[DATUM INVULLEN]"
 dateModified: "[DATUM INVULLEN]"
 category: "webdesign"

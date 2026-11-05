@@ -1,0 +1,36 @@
+---
+import { ArrowRight } from '@lucide/astro';
+
+const profileUrl = import.meta.env.PUBLIC_GOOGLE_PROFILE_URL?.trim();
+const hasProfileUrl = profileUrl?.startsWith('https://') ?? false;
+---
+
+<aside class="google-follow container" aria-labelledby="google-follow-title">
+  <span class="google-badge" aria-hidden="true"><span>G</span></span>
+  <div class="google-follow-copy">
+    <p class="eyebrow">CF Media op Google</p>
+    <h2 id="google-follow-title">Volg CF Media op Google</h2>
+    <p>Blijf op de hoogte van inzichten over SEO, GEO en webdesign.</p>
+  </div>
+  {hasProfileUrl ? (
+    <a class="google-follow-button" href={profileUrl} target="_blank" rel="noopener noreferrer">
+      Volgen op Google <ArrowRight size={18} aria-hidden="true" />
+    </a>
+  ) : (
+    <span class="google-follow-button is-unconfigured" aria-disabled="true">Google-profielkoppeling invullen</span>
+  )}
+</aside>
+
+<style>
+  .google-follow { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr) auto; align-items: center; gap: 1.5rem; margin-block: 2rem; padding: 1.5rem; border: 1px solid var(--line); border-left: 4px solid var(--accent); background: var(--surface); box-shadow: 0 0.4rem 1.2rem color-mix(in srgb, var(--ink) 7%, transparent); }
+  .google-badge { display: grid; width: 4rem; height: 4rem; place-items: center; border-radius: 50%; background: var(--surface-soft); }
+  .google-badge span { background: conic-gradient(from -45deg, #4285f4 0 25%, #34a853 25% 50%, #fbbc05 50% 75%, #ea4335 75%); background-clip: text; color: transparent; font-family: Arial, sans-serif; font-size: 2.4rem; font-weight: 700; -webkit-background-clip: text; }
+  .google-follow-copy { min-width: 0; }
+  .google-follow-copy .eyebrow { margin: 0 0 0.2rem; color: var(--accent); font-size: 0.7rem; }
+  .google-follow-copy h2 { margin: 0; font-size: 1.35rem; }
+  .google-follow-copy p:last-child { margin: 0.25rem 0 0; color: var(--muted); line-height: 1.5; }
+  .google-follow-button { display: inline-flex; min-height: 3rem; align-items: center; justify-content: center; gap: 0.7rem; padding: 0.75rem 1rem; border: 1px solid var(--accent); background: var(--accent); color: var(--button-ink); font-size: 0.9rem; font-weight: 700; text-align: center; text-decoration: none; }
+  a.google-follow-button:hover { border-color: var(--accent-hover); background: var(--accent-hover); }
+  .google-follow-button.is-unconfigured { max-width: 15rem; border-color: var(--line); background: var(--surface-soft); color: var(--muted); font-size: 0.78rem; font-weight: 500; }
+  @media (max-width: 700px) { .google-follow { grid-template-columns: 3.25rem minmax(0, 1fr); gap: 1rem; padding: 1rem; } .google-badge { width: 3rem; height: 3rem; } .google-badge span { font-size: 1.9rem; } .google-follow-button { grid-column: 1 / -1; width: 100%; } }
+</style>

@@ -4,8 +4,7 @@ description: "Een technische SEO-basis helpt zoekmachines je website crawlen en 
 author:
   name: "[NAAM AUTEUR INVULLEN]"
   jobTitle: "[FUNCTIE INVULLEN]"
-  teamSlug: "teamlid-invullen"
-  photo: "../../../assets/team-placeholder.svg"
+  photo: "../../../assets/fabian-clemens.jpg"
 datePublished: "[DATUM INVULLEN]"
 dateModified: "[DATUM INVULLEN]"
 category: "seo"

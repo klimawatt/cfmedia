@@ -1,7 +1,12 @@
 ---
 import { ArrowUpRight, PanelsTopLeft, Search, Sparkles } from '@lucide/astro';
 import { Image } from 'astro:assets';
+import { getArticles } from '../lib/articles';
+import { getPageContent, seoProps } from '../lib/cms';
+import { pageDefaults } from '../data/pages';
+import GoogleFollowBanner from '../components/GoogleFollowBanner.astro';
 import SiteLayout from '../layouts/SiteLayout.astro';
+import fabianPortrait from '../assets/fabian-clemens.jpg';
 import seoDashboard from '../assets/seo-dashboard.jpg';
 
 const services = [
@@ -9,6 +14,16 @@ const services = [
   { number: '02', name: 'GEO', description: 'Maak je informatie herkenbaar voor AI-zoekmachines.', href: '/diensten/geo/', tone: 'lime' },
   { number: '03', name: 'Webdesign', description: 'Geef bezoekers een website die logisch werkt en prettig leest.', href: '/diensten/webdesign/', tone: 'coral' },
 ];
+const allArticles = await getArticles({ includeDrafts: import.meta.env.DEV });
+const featuredArticle = allArticles.find(({ data }) => !data.draft)
+  ?? (import.meta.env.DEV ? allArticles.find(({ id }) => id.endsWith('wat-is-seo')) : undefined);
+const featuredArticleHref = featuredArticle?.data.draft
+  ? `/kennisbank/${featuredArticle.data.category}/`
+  : featuredArticle
+    ? `/kennisbank/${featuredArticle.data.category}/${featuredArticle.id.split('/').at(-1)}/`
+    : undefined;
+
+const c = await getPageContent('home', pageDefaults.home);
 
 const organization = {
   '@context': 'https://schema.org',
@@ -17,29 +32,39 @@ const organization = {
   url: 'https://www.cfmedia.nl/',
   logo: 'https://www.cfmedia.nl/images/cfmedia-logo.svg',
   description: 'Nederlands bureau voor SEO, GEO en webdesign.',
-  address: { '@type': 'PostalAddress', streetAddress: '[ADRES INVULLEN]', addressCountry: 'NL' },
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Ieplaan 54',
+    postalCode: '2822 EC',
+    addressLocality: 'Rijswijk',
+    addressCountry: 'NL',
+  },
   contactPoint: {
     '@type': 'ContactPoint', contactType: 'customer service',
-    email: '[E-MAIL INVULLEN]', telephone: '[TELEFOON INVULLEN]',
+    email: 'info@cfmedia.nl', telephone: '[TELEFOON INVULLEN]',
   },
+  taxID: '81830033',
   sameAs: [],
 };
+const seo = seoProps(c.seo, { title: 'CF Media | SEO, GEO en webdesign', description: 'CF Media helpt je met SEO, GEO en webdesign. Maak je website beter vindbaar en prettiger in gebruik.', canonical: 'https://www.cfmedia.nl/' });
 ---
 
 <SiteLayout
-  title="CF Media | SEO, GEO en webdesign"
-  description="CF Media helpt je met SEO, GEO en webdesign. Maak je website beter vindbaar en prettiger in gebruik."
-  canonical="https://www.cfmedia.nl/"
+  title={seo.title}
+  description={seo.description}
+  canonical={seo.canonical}
+  noindex={seo.noindex}
+  image={seo.image}
   structuredData={organization}
 >
   <div class="home-page">
     <section class="hero" aria-labelledby="hero-title">
       <div class="container hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> CF Media · SEO / GEO / webdesign</p>
-          <h1 id="hero-title">Je website verdient een plek in beeld.</h1>
-          <p class="intro">We maken je online verhaal beter vindbaar, begrijpelijker en klaar om bezoekers verder te helpen.</p>
-          <a class="hero-link" href="/diensten/">Ontdek wat we doen <ArrowUpRight size={18} aria-hidden="true" /></a>
+          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> {c.heroEyebrow}</p>
+          <h1 id="hero-title">{c.heroTitle}</h1>
+          <p class="intro">{c.heroIntro}</p>
+          <a class="hero-link" href="/diensten/">{c.heroLinkLabel} <ArrowUpRight size={18} aria-hidden="true" /></a>
           <div class="hero-index" aria-hidden="true"><span>01</span><span>STRATEGIE</span><span>02</span><span>RESULTAAT</span></div>
         </div>
 
@@ -61,7 +86,7 @@ const organization = {
     </section>
 
     <section class="container services section-space" aria-labelledby="services-heading">
-      <div class="section-heading"><p class="eyebrow">Waar we aan werken</p><h2 id="services-heading">Drie disciplines.<br />Eén sterke basis.</h2><p>Je kiest wat je nodig hebt. We verbinden de onderdelen waar dat zinvol is.</p></div>
+      <div class="section-heading"><p class="eyebrow">Waar we aan werken</p><h2 id="services-heading">{c.servicesTitle}</h2><p>{c.servicesIntro}</p></div>
       <div class="service-grid">
         {services.map((service) => <a class={`service-block ${service.tone}`} href={service.href}><span class="block-top"><span>{service.number} / DIENST</span><ArrowUpRight size={20} aria-hidden="true" /></span><span class="block-symbol" aria-hidden="true">{service.number === '01' ? <Search size={36} stroke-width={1.5} /> : service.number === '02' ? <Sparkles size={36} stroke-width={1.5} /> : <PanelsTopLeft size={36} stroke-width={1.5} />}</span><h3>{service.name}</h3><p>{service.description}</p><span class="block-link">Meer over {service.name} <ArrowUpRight size={16} aria-hidden="true" /></span></a>)}
       </div>
@@ -79,8 +104,8 @@ const organization = {
 
     <section class="case-section" aria-labelledby="cases-heading">
       <div class="container case-layout">
-        <div class="case-copy"><p class="eyebrow">Werk in de praktijk</p><h2 id="cases-heading">Goed werk laat zich zien.</h2><p>We delen cases zodra de klantnaam, aanpak en uitkomst goedgekeurd zijn.</p><a class="text-link" href="/cases/">Bekijk de cases <ArrowUpRight size={17} aria-hidden="true" /></a></div>
-        <a class="case-block" href="/cases/case-invullen/"><span class="case-kicker">CASE / 001</span><span class="case-shape" aria-hidden="true"><i></i><i></i><i></i></span><strong>[CASE: klantnaam + resultaat invullen]</strong><span class="case-bottom">Bekijk de case-opzet <ArrowUpRight size={17} aria-hidden="true" /></span></a>
+        <div class="case-copy"><p class="eyebrow">Werk in de praktijk</p><h2 id="cases-heading">{c.caseTitle}</h2><p>{c.caseText}</p><a class="text-link" href="/cases/">Bekijk de cases <ArrowUpRight size={17} aria-hidden="true" /></a></div>
+        <a class="case-block" href="/cases/"><span class="case-kicker">CASES / CF MEDIA</span><span class="case-shape" aria-hidden="true"><i></i><i></i><i></i></span><strong>Een paar goede cases laten zien hoe je samenwerkt.</strong><span class="case-bottom">Bekijk de cases <ArrowUpRight size={17} aria-hidden="true" /></span></a>
       </div>
     </section>
 
@@ -91,19 +116,32 @@ const organization = {
 
     <section class="process-section" aria-labelledby="process-heading">
       <div class="container process-inner">
-        <div class="process-heading"><p class="eyebrow">Zo werken we</p><h2 id="process-heading">Geen mist.<br />Wel een volgende stap.</h2><p>Je weet waar we aan werken en waarom dat de prioriteit krijgt.</p></div>
+        <div class="process-heading"><p class="eyebrow">Zo werken we</p><h2 id="process-heading">{c.processTitle}</h2><p>{c.processIntro}</p></div>
         <ol class="process-grid"><li><span class="step-number">01</span><div><h3>Luisteren</h3><p>We brengen je vraag en doelen scherp in beeld.</p></div></li><li><span class="step-number">02</span><div><h3>Richting kiezen</h3><p>We onderzoeken de situatie en maken keuzes concreet.</p></div></li><li><span class="step-number">03</span><div><h3>Verbeteren</h3><p>We voeren uit, delen wat verandert en bepalen wat volgt.</p></div></li></ol>
+      </div>
+    </section>
+
+    <section class="founder-section" aria-labelledby="founder-heading">
+      <div class="container founder-grid">
+        <figure class="founder-portrait"><Image src={fabianPortrait} alt="Portret van Fabian Clemens, eigenaar van CF Media" width={320} height={320} format="webp" sizes="(max-width: 760px) 70vw, 22rem" loading="lazy" /><figcaption>Fabian Clemens / Eigenaar van CF Media</figcaption></figure>
+        <div class="founder-copy"><p class="eyebrow">Over de eigenaar</p><h2 id="founder-heading">{c.founderTitle}</h2><p class="founder-role">{c.founderRole}</p><p>{c.founderText}</p><a class="founder-link" href="/over-mij/">Meer over mij <ArrowUpRight size={17} aria-hidden="true" /></a></div>
       </div>
     </section>
 
     <section class="knowledge-section">
       <div class="container knowledge-inner"><div><p class="eyebrow">Kennis om verder te komen</p><h2>Vragen verdienen duidelijke antwoorden.</h2></div><a class="knowledge-link" href="/kennisbank/">Naar de kennisbank <ArrowUpRight size={20} aria-hidden="true" /></a></div>
       <div class="container knowledge-tags" aria-label="Kennisbankcategorieën"><a href="/kennisbank/seo/">SEO <span>01</span></a><a href="/kennisbank/geo/">GEO <span>02</span></a><a href="/kennisbank/webdesign/">Webdesign <span>03</span></a></div>
+      {featuredArticle && featuredArticleHref && <a class="container featured-article" href={featuredArticleHref}>
+        {featuredArticle.data.cover && <Image src={featuredArticle.data.cover} alt={featuredArticle.data.coverAlt ?? ''} width={featuredArticle.data.cover.width} height={featuredArticle.data.cover.height} format="webp" sizes="(max-width: 760px) 100vw, 42vw" loading="lazy" />}
+        <span class="featured-copy"><span class="featured-label">{featuredArticle.data.draft ? 'Concept / niet gepubliceerd' : `Artikel / ${featuredArticle.data.category}`}</span><strong>{featuredArticle.data.title}</strong><span>{featuredArticle.data.description}</span><span class="featured-link">{featuredArticle.data.draft ? 'Bekijk categorie' : 'Lees artikel'} <ArrowUpRight size={16} aria-hidden="true" /></span></span>
+      </a>}
     </section>
+
+    <GoogleFollowBanner />
 
     <section class="meeting-cta" aria-labelledby="meeting-cta-title">
       <div class="container meeting-cta-grid">
-        <div class="meeting-cta-copy"><p class="eyebrow">Kennismaken met CF Media</p><h2 id="meeting-cta-title">Plan een kennismakingsgesprek.</h2><p>Vertel waar je aan werkt. We denken mee over een passende eerste stap voor je website.</p><a class="cta-button" href="#meeting-form">Plan je gesprek <ArrowUpRight size={18} aria-hidden="true" /></a></div>
+        <div class="meeting-cta-copy"><p class="eyebrow">Kennismaken met CF Media</p><h2 id="meeting-cta-title">{c.ctaTitle}</h2><p>{c.ctaText}</p><a class="cta-button" href="#meeting-form">Plan je gesprek <ArrowUpRight size={18} aria-hidden="true" /></a></div>
         <div class="meeting-points"><article><span>01 / JE VRAAG</span><h3>Wat wil je bereiken?</h3><p>We beginnen bij je website, je doelen en de vragen die je hebt.</p></article><article><span>02 / VERVOLG</span><h3>Een heldere volgende stap.</h3><p>We bekijken samen welke expertise past: SEO, GEO of webdesign.</p></article></div>
       </div>
     </section>
@@ -112,18 +150,14 @@ const organization = {
 
 <style>
   .home-page {
-    --hero-surface: #e9f0e9;
-    --hero-text: #17231d;
-    --service-blue: #dcecff;
-    --service-lime: #c8ec7c;
-    --service-coral: #ffddd3;
-    --case-bg: #19382c;
-    --case-ink: #f5f7f2;
-    --light-ink: #17231d;
-    --focus-bg: #f4d66f;
-  }
-  @media (prefers-color-scheme: dark) {
-    .home-page { --hero-surface: #202a23; --hero-text: #edf4ee; --service-blue: #203748; --service-lime: #32452a; --service-coral: #4a302b; --case-bg: #243f32; --case-ink: #f5f7f2; --light-ink: #f5f7f2; --focus-bg: #4a4224; }
+    --hero-surface: var(--paper);
+    --hero-text: var(--ink);
+    --service-blue: var(--surface-soft);
+    --service-lime: var(--surface-soft);
+    --service-coral: var(--surface-soft);
+    --case-bg: var(--night);
+    --case-ink: var(--night-ink);
+    --light-ink: var(--ink);
   }
   .hero { position: relative; overflow: hidden; padding-block: 3.5rem 1.25rem; background-color: var(--hero-surface); color: var(--hero-text); background-image: radial-gradient(var(--line) 0.7px, transparent 0.7px); background-size: 18px 18px; }
   .hero-grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(23rem, 0.92fr); align-items: center; gap: clamp(2rem, 5vw, 5rem); }
@@ -158,9 +192,7 @@ const organization = {
   .service-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.85rem; }
   .service-block { position: relative; display: flex; min-width: 0; min-height: 20rem; flex-direction: column; align-items: flex-start; padding: 1.15rem; color: var(--light-ink); text-decoration: none; transition: transform 180ms ease; }
   .service-block:hover { transform: translateY(-4px); }
-  .service-block.blue { background: var(--service-blue); }
-  .service-block.lime { background: var(--service-lime); }
-  .service-block.coral { background: var(--service-coral); }
+  .service-block.blue, .service-block.lime, .service-block.coral { border-top: 3px solid var(--accent); background: var(--surface-soft); }
   .block-top { display: flex; width: 100%; justify-content: space-between; color: inherit; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; }
   .block-symbol { margin-top: auto; font-size: 2.4rem; line-height: 1; }
   .service-block h3 { margin: 0.75rem 0 0.4rem; font-size: 1.55rem; }
@@ -175,17 +207,17 @@ const organization = {
   .signal-copy h2 { max-width: 13ch; margin: 0.65rem 0; font-size: 2.7rem; line-height: 1.08; }
   .signal-copy > p:not(.eyebrow) { color: var(--muted); line-height: 1.65; }
   .signal-copy .text-link { margin-top: 0.5rem; }
-  .case-section { padding-block: 5rem; background: var(--green-bright); }
+  .case-section { padding-block: 5rem; background: var(--surface-soft); }
   .case-layout { display: grid; grid-template-columns: 0.85fr 1.15fr; align-items: center; gap: 3rem; }
-  .case-copy > p:not(.eyebrow) { color: var(--ink); }
+  .case-copy > p:not(.eyebrow) { color: var(--muted); }
   .case-copy .text-link { margin-top: 0.75rem; color: var(--ink); }
   .case-block { position: relative; display: flex; min-height: 19rem; flex-direction: column; align-items: flex-start; justify-content: space-between; overflow: hidden; padding: 1.4rem; background: var(--case-bg); color: var(--case-ink); text-decoration: none; }
   .case-kicker, .case-bottom { position: relative; z-index: 1; display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; font-weight: 700; }
   .case-block strong { position: relative; z-index: 1; max-width: 16ch; font-size: 2rem; line-height: 1.1; }
   .case-shape { position: absolute; top: 0; right: 0; display: flex; width: 48%; height: 100%; align-items: center; justify-content: center; gap: 0.45rem; opacity: 0.65; transform: rotate(-24deg) translate(12%, -8%); }
-  .case-shape i { display: block; width: 1.6rem; height: 75%; background: var(--coral); }
-  .case-shape i:nth-child(2) { height: 105%; background: var(--service-lime); }
-  .case-shape i:nth-child(3) { height: 55%; background: var(--service-blue); }
+  .case-shape i { display: block; width: 1.6rem; height: 75%; background: var(--accent); }
+  .case-shape i:nth-child(2) { height: 105%; background: var(--surface-soft); }
+  .case-shape i:nth-child(3) { height: 55%; background: var(--accent-hover); }
   .partners { display: grid; grid-template-columns: 0.8fr 1.2fr; align-items: center; gap: 3rem; padding-block: 5rem; }
   .partners h2 { font-size: 2.4rem; }
   .logo-placeholders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
@@ -197,25 +229,42 @@ const organization = {
   .step-number { color: var(--green); font-size: 0.8rem; font-weight: 700; }
   .process-grid h3 { margin: 0; font-size: 1.15rem; }
   .process-grid p { margin: 0.35rem 0 0; color: var(--muted); line-height: 1.55; }
-  .knowledge-section { padding-block: 4.5rem; background: var(--service-blue); color: var(--light-ink); }
+  .founder-section { padding-block: 4.5rem; background: var(--night); color: var(--night-ink); }
+  .founder-grid { display: grid; grid-template-columns: minmax(12rem, 0.42fr) minmax(0, 1fr); align-items: center; gap: clamp(2rem, 6vw, 5rem); }
+  .founder-portrait { width: min(100%, 17rem); margin: 0; }
+  .founder-portrait :global(img) { display: block; width: 100%; aspect-ratio: 1; border: 3px solid var(--accent); border-radius: 50%; object-fit: cover; }
+  .founder-portrait figcaption { margin-top: 0.5rem; color: var(--night-muted); font-size: 0.72rem; text-align: center; }
+  .founder-copy .eyebrow { color: var(--accent-on-dark); }
+  .founder-copy h2 { margin: 0.35rem 0; font-size: var(--type-h2); }
+  .founder-role { margin: 0; color: var(--night-muted); font-size: 1.05rem; }
+  .founder-copy > p:not(.eyebrow, .founder-role) { max-width: 48rem; margin-block: 1rem; color: var(--night-muted); line-height: 1.7; }
+  .founder-link { display: inline-flex; align-items: center; gap: 0.6rem; margin-top: 0.4rem; color: var(--accent-on-dark); font-weight: 700; text-underline-offset: 0.2em; }
+  .knowledge-section { padding-block: 4.5rem; background: var(--surface-soft); color: var(--light-ink); }
   .knowledge-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; }
   .knowledge-inner h2 { max-width: 13ch; }
   .knowledge-link { flex: 0 0 auto; color: var(--light-ink); }
   .knowledge-tags { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2.5rem; }
   .knowledge-tags a { display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid currentColor; color: inherit; font-weight: 700; text-decoration: none; }
   .knowledge-tags span { font-size: 0.75rem; font-weight: 400; }
-  .meeting-cta { overflow: hidden; padding-block: 5rem; background: radial-gradient(ellipse at 88% 18%, #682a20 0, transparent 45%), #17171a; color: #fff; }
+  .featured-article { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); margin-top: 2rem; background: var(--surface); color: var(--ink); text-decoration: none; }
+  .featured-article :global(img) { display: block; width: 100%; height: 100%; min-height: 16rem; object-fit: cover; }
+  .featured-copy { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 0.7rem; padding: 1.5rem; }
+  .featured-label { color: var(--green); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+  .featured-copy strong { max-width: 18ch; font-family: 'Space Grotesk Variable', sans-serif; font-size: 1.8rem; line-height: 1.1; }
+  .featured-copy > span:nth-child(3) { color: var(--muted); font-size: 0.9rem; line-height: 1.55; }
+  .featured-link { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.2rem; color: var(--green); font-size: 0.82rem; font-weight: 700; }
+  .meeting-cta { overflow: hidden; padding-block: 5rem; background: radial-gradient(ellipse at 88% 18%, color-mix(in srgb, var(--accent) 32%, transparent) 0, transparent 45%), var(--night); color: var(--night-ink); }
   .meeting-cta-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 3rem; }
-  .meeting-cta-copy .eyebrow { color: #ff9a79; }
+  .meeting-cta-copy .eyebrow { color: var(--accent-on-dark); }
   .meeting-cta-copy h2 { max-width: 13ch; margin: 0.75rem 0 1rem; font-size: 3rem; line-height: 1.05; }
-  .meeting-cta-copy > p:not(.eyebrow) { max-width: 34rem; margin-bottom: 1.5rem; color: #d3d0d0; line-height: 1.65; }
-  .cta-button { display: inline-flex; min-height: 3.25rem; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 0.8rem 1rem; background: var(--coral); color: #17171a; font-weight: 700; text-decoration: none; }
-  .cta-button:hover { background: #fff; }
+  .meeting-cta-copy > p:not(.eyebrow) { max-width: 34rem; margin-bottom: 1.5rem; color: var(--night-muted); line-height: 1.65; }
+  .cta-button { display: inline-flex; min-height: 3.25rem; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 0.8rem 1rem; background: var(--accent); color: var(--button-ink); font-weight: 700; text-decoration: none; }
+  .cta-button:hover { background: var(--accent-hover); }
   .meeting-points { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
   .meeting-points article { min-width: 0; min-height: 13rem; padding: 1.15rem; border: 1px solid #ffffff20; border-radius: 6px; background: #ffffff0c; }
-  .meeting-points article > span { color: #ffad95; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; }
+  .meeting-points article > span { color: var(--accent-on-dark); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; }
   .meeting-points h3 { margin: 2rem 0 0.5rem; font-size: 1.2rem; }
-  .meeting-points p { margin: 0; color: #d3d0d0; font-size: 0.9rem; line-height: 1.55; }
+  .meeting-points p { margin: 0; color: var(--night-muted); font-size: 0.9rem; line-height: 1.55; }
   @media (max-width: 1000px) {
     .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.9fr); gap: 2rem; }
     .services { grid-template-columns: 1fr; gap: 2rem; }
@@ -224,7 +273,7 @@ const organization = {
   }
   @media (max-width: 760px) {
     .hero { padding-top: 1.5rem; }
-    .hero-grid, .case-layout, .partners, .process-inner, .signal-grid { grid-template-columns: 1fr; }
+    .hero-grid, .case-layout, .partners, .process-inner, .signal-grid, .founder-grid { grid-template-columns: 1fr; }
     .hero-copy { padding-block: 2rem 0.5rem; }
     h1 { max-width: 12ch; font-size: 3.4rem; }
     .hero-index { margin-top: 2rem; }
@@ -234,8 +283,11 @@ const organization = {
     .case-block { min-height: 16rem; }
     .signal-section { padding-block: 3rem; }
     .signal-copy h2 { font-size: 2.25rem; }
+    .founder-portrait { width: min(60vw, 14rem); margin-inline: auto; }
     .partners { gap: 1.5rem; }
     .knowledge-inner { align-items: flex-start; flex-direction: column; }
+    .featured-article { grid-template-columns: 1fr; }
+    .featured-article :global(img) { aspect-ratio: 1.7; min-height: 0; }
     .meeting-cta-grid { grid-template-columns: 1fr; gap: 2rem; }
     .meeting-cta-copy h2 { font-size: 2.25rem; }
   }

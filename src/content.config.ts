@@ -20,7 +20,6 @@ const articles = defineCollection({
     author: z.object({
       name: z.string().min(1),
       jobTitle: z.string().min(1),
-      teamSlug: z.string().min(1),
       photo: image(),
     }),
     cover: image().optional(),
@@ -53,6 +52,7 @@ const cases = defineCollection({
     problem: z.string().min(1),
     approach: z.string().min(1),
     result: z.string().min(1),
+    draft: z.boolean().default(false),
   }),
 });
 

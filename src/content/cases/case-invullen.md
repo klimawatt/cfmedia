@@ -5,6 +5,7 @@ serviceTags: []
 problem: "[CASE: probleem van de klant invullen]"
 approach: "[CASE: aanpak invullen]"
 result: "[CASE: klantnaam + resultaat invullen]"
+draft: true
 ---
 
 Deze case is een invulopzet. Vervang de placeholders door goedgekeurde klantinformatie voordat je de pagina deelt.
