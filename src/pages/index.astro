@@ -41,7 +41,7 @@ const organization = {
           <div class="hero-index" aria-hidden="true"><span>01</span><span>STRATEGIE</span><span>02</span><span>RESULTAAT</span></div>
         </div>
 
-        <form class="meeting-card" name="cfmedia-gesprek" method="POST" action="/contact/bedankt/" data-netlify="true" netlify-honeypot="bot-field">
+        <form id="meeting-form" class="meeting-card" tabindex="-1" name="cfmedia-gesprek" method="POST" action="/contact/bedankt/" data-netlify="true" netlify-honeypot="bot-field">
           <input type="hidden" name="form-name" value="cfmedia-gesprek" />
           <p class="honeypot"><label>Niet invullen <input name="bot-field" /></label></p>
           <div class="form-heading"><span class="form-mark" aria-hidden="true">CF</span><div><p class="eyebrow">Eerste stap</p><h2>Plan een gesprek</h2></div></div>
@@ -89,7 +89,12 @@ const organization = {
       <div class="container knowledge-tags" aria-label="Kennisbankcategorieën"><a href="/kennisbank/seo/">SEO <span>01</span></a><a href="/kennisbank/geo/">GEO <span>02</span></a><a href="/kennisbank/webdesign/">Webdesign <span>03</span></a></div>
     </section>
 
-    <section class="container final-cta"><p class="eyebrow">Klaar voor een eerste stap?</p><h2>Leg je vraag bij ons neer.</h2><a class="button-primary" href="#hero-title">Plan een gesprek <ArrowUpRight size={18} aria-hidden="true" /></a></section>
+    <section class="meeting-cta" aria-labelledby="meeting-cta-title">
+      <div class="container meeting-cta-grid">
+        <div class="meeting-cta-copy"><p class="eyebrow">Kennismaken met CF Media</p><h2 id="meeting-cta-title">Plan een kennismakingsgesprek.</h2><p>Vertel waar je aan werkt. We denken mee over een passende eerste stap voor je website.</p><a class="cta-button" href="#meeting-form">Plan je gesprek <ArrowUpRight size={18} aria-hidden="true" /></a></div>
+        <div class="meeting-points"><article><span>01 / JE VRAAG</span><h3>Wat wil je bereiken?</h3><p>We beginnen bij je website, je doelen en de vragen die je hebt.</p></article><article><span>02 / VERVOLG</span><h3>Een heldere volgende stap.</h3><p>We bekijken samen welke expertise past: SEO, GEO of webdesign.</p></article></div>
+      </div>
+    </section>
   </div>
 </SiteLayout>
 
@@ -178,8 +183,18 @@ const organization = {
   .knowledge-tags { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2.5rem; }
   .knowledge-tags a { display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid currentColor; color: inherit; font-weight: 700; text-decoration: none; }
   .knowledge-tags span { font-size: 0.75rem; font-weight: 400; }
-  .final-cta { display: flex; min-height: 18rem; flex-direction: column; align-items: flex-start; justify-content: center; padding-block: 4rem; }
-  .final-cta h2 { margin-bottom: 1.25rem; }
+  .meeting-cta { overflow: hidden; padding-block: 5rem; background: radial-gradient(ellipse at 88% 18%, #682a20 0, transparent 45%), #17171a; color: #fff; }
+  .meeting-cta-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 3rem; }
+  .meeting-cta-copy .eyebrow { color: #ff9a79; }
+  .meeting-cta-copy h2 { max-width: 13ch; margin: 0.75rem 0 1rem; font-size: 3rem; line-height: 1.05; }
+  .meeting-cta-copy > p:not(.eyebrow) { max-width: 34rem; margin-bottom: 1.5rem; color: #d3d0d0; line-height: 1.65; }
+  .cta-button { display: inline-flex; min-height: 3.25rem; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 0.8rem 1rem; background: var(--coral); color: #17171a; font-weight: 700; text-decoration: none; }
+  .cta-button:hover { background: #fff; }
+  .meeting-points { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
+  .meeting-points article { min-width: 0; min-height: 13rem; padding: 1.15rem; border: 1px solid #ffffff20; border-radius: 6px; background: #ffffff0c; }
+  .meeting-points article > span { color: #ffad95; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; }
+  .meeting-points h3 { margin: 2rem 0 0.5rem; font-size: 1.2rem; }
+  .meeting-points p { margin: 0; color: #d3d0d0; font-size: 0.9rem; line-height: 1.55; }
   @media (max-width: 1000px) {
     .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.9fr); gap: 2rem; }
     .services { grid-template-columns: 1fr; gap: 2rem; }
@@ -198,6 +213,8 @@ const organization = {
     .case-block { min-height: 16rem; }
     .partners { gap: 1.5rem; }
     .knowledge-inner { align-items: flex-start; flex-direction: column; }
+    .meeting-cta-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .meeting-cta-copy h2 { font-size: 2.25rem; }
   }
   @media (max-width: 520px) {
     .hero-grid { width: min(100% - 2rem, 76rem); }
@@ -211,6 +228,10 @@ const organization = {
     .logo-placeholders span { min-height: 3.5rem; }
     .knowledge-section { padding-block: 3.5rem; }
     .knowledge-tags { grid-template-columns: 1fr; gap: 0.75rem; }
+    .meeting-cta { padding-block: 3.5rem; }
+    .meeting-points { grid-template-columns: 1fr; }
+    .meeting-points article { min-height: 10rem; }
+    .meeting-points h3 { margin-top: 1.25rem; }
   }
   @media (prefers-reduced-motion: reduce) { .service-block { transition: none; } }
 </style>
