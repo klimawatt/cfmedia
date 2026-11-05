@@ -1,0 +1,59 @@
+---
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { breadcrumbSchema } from '../utils/structured-data';
+
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Tarieven', href: '/tarieven/' }];
+const structuredData = breadcrumbSchema(crumbs);
+const pricing = [
+  { name: 'SEO', unit: '[PER MAAND / PROJECT INVULLEN]', detail: 'Technische verbeteringen, content of advies op basis van je vraag.', href: '/diensten/seo/' },
+  { name: 'GEO', unit: '[PER MAAND / PROJECT INVULLEN]', detail: 'Analyse en verbeterwerk voor je zichtbaarheid in AI-zoekervaringen.', href: '/diensten/geo/' },
+  { name: 'Webdesign', unit: '[PER PROJECT INVULLEN]', detail: 'Een website of webshop met scope en oplevermoment vooraf afgestemd.', href: '/diensten/webdesign/' },
+];
+---
+
+<SiteLayout title="Tarieven | CF Media" description="Bekijk hoe de tarieven van CF Media worden opgebouwd. Bedragen en voorwaarden worden per dienst transparant ingevuld." canonical="https://www.cfmedia.nl/tarieven/" structuredData={structuredData}>
+  <Breadcrumbs items={crumbs} />
+  <header class="container page-hero">
+    <p class="eyebrow">Kosten en scope</p>
+    <h1>Tarieven, helder opgebouwd.</h1>
+    <p>De uiteindelijke prijs hangt af van de vraag, omvang en gewenste ondersteuning. Vooraf leggen we vast wat je krijgt, wat het kost en welke voorwaarden gelden.</p>
+  </header>
+  <section class="container pricing-section" aria-labelledby="pricing-heading">
+    <h2 id="pricing-heading" class="visually-hidden">Tarieven per dienst</h2>
+    <div class="pricing-head"><span>Dienst</span><span>Prijs en eenheid</span><span>Opbouw</span></div>
+    {pricing.map((item) => <article class="pricing-row"><h3><a href={item.href}>{item.name}</a></h3><p class="price">[BEDRAG INVULLEN] <small>{item.unit}</small></p><p>{item.detail}</p></article>)}
+  </section>
+  <section class="container pricing-notes">
+    <div><p class="eyebrow">Vooraf duidelijk</p><h2>Dit spreken we samen af.</h2></div>
+    <ul><li>De werkzaamheden en grenzen van de opdracht.</li><li>De prijs, eventuele btw en het betaalmoment.</li><li>De planning en wat we van elkaar nodig hebben.</li><li>Hoe we omgaan met wijzigingen buiten de afgesproken scope.</li></ul>
+  </section>
+  <section class="container pricing-cta"><p class="eyebrow">Een vraag over kosten?</p><h2>Leg je situatie aan ons voor.</h2><a class="button-primary" href="/contact/">Plan een gesprek <span aria-hidden="true">↗</span></a></section>
+</SiteLayout>
+
+<style>
+  .page-hero { padding-block: 4rem 3rem; }
+  h1 { max-width: 13ch; margin: 0.75rem 0; font-size: clamp(2.8rem, 6vw, 5.5rem); line-height: 1.02; }
+  .page-hero > p:last-child { max-width: 48rem; color: var(--muted); font-size: 1.15rem; line-height: 1.65; }
+  .pricing-section { padding-bottom: 4rem; }
+  .pricing-head, .pricing-row { display: grid; grid-template-columns: 0.8fr 1.1fr 1.5fr; gap: 1.5rem; }
+  .pricing-head { padding-block: 0.8rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.8rem; font-weight: 700; }
+  .pricing-row { align-items: start; padding-block: 1.4rem; border-top: 1px solid var(--line); }
+  .pricing-row h3 { margin: 0; font-size: 1.3rem; }
+  .pricing-row h3 a { text-decoration: none; }
+  .price { margin: 0; font-size: 1.1rem; font-weight: 700; overflow-wrap: anywhere; }
+  .price small { display: block; margin-top: 0.3rem; color: var(--muted); font-size: 0.8rem; font-weight: 400; }
+  .pricing-row > p:last-child { margin: 0; color: var(--muted); line-height: 1.55; }
+  .pricing-notes { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding-block: 3rem; border-top: 1px solid var(--line); }
+  .pricing-notes h2, .pricing-cta h2 { max-width: 15ch; margin: 0.5rem 0; font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.1; }
+  .pricing-notes ul { margin: 0; padding-left: 1.2rem; color: var(--muted); line-height: 1.8; }
+  .pricing-cta { margin-block: 1rem 5rem; padding: clamp(1.5rem, 5vw, 4rem); background: var(--green-bright); }
+  .pricing-cta h2 { margin-bottom: 1.5rem; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+  @media (max-width: 650px) {
+    .pricing-head { display: none; }
+    .pricing-row { grid-template-columns: 1fr; gap: 0.5rem; }
+    .price small { display: inline; margin-left: 0.4rem; }
+    .pricing-notes { grid-template-columns: 1fr; }
+  }
+</style>
