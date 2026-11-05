@@ -44,7 +44,7 @@ const makeSubservice = (
   hub,
   name,
   title: `${name} | CF Media`,
-  description: `${summary} CF Media helpt je met een aanpak die past bij je website en doelen.`,
+  description: `${summary} Ontdek de aanpak van CF Media.`,
   summary,
   problem,
   approach,
