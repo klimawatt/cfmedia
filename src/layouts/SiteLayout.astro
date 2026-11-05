@@ -1,0 +1,142 @@
+---
+import { ArrowUpRight, Menu, X } from '@lucide/astro';
+import SEOHead from '../components/SEOHead.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  canonical: string;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const { title, description, canonical, structuredData = [] } = Astro.props;
+const services = [
+  { label: 'SEO', href: '/diensten/seo/' },
+  { label: 'GEO', href: '/diensten/geo/' },
+  { label: 'Webdesign', href: '/diensten/webdesign/' },
+];
+---
+
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f7f2" />
+    <SEOHead title={title} description={description} canonical={canonical} structuredData={structuredData} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Ga naar de inhoud</a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="wordmark" href="/" aria-label="CF Media, home">CF<span>·</span>MEDIA</a>
+        <button class="menu-toggle" type="button" aria-label="Menu openen" aria-expanded="false" aria-controls="main-nav">
+          <Menu class="menu-open" size={22} aria-hidden="true" />
+          <X class="menu-close" size={22} aria-hidden="true" />
+        </button>
+        <nav id="main-nav" class="main-nav" aria-label="Hoofdnavigatie">
+          <details class="nav-services">
+            <summary>Diensten</summary>
+            <div class="services-menu">
+              {services.map((service) => <a href={service.href}>{service.label}<ArrowUpRight size={16} aria-hidden="true" /></a>)}
+            </div>
+          </details>
+          <a href="/cases/">Cases</a>
+          <a href="/kennisbank/">Kennisbank</a>
+          <a href="/tarieven/">Tarieven</a>
+          <a href="/over-ons/">Over ons</a>
+          <a href="/contact/">Contact</a>
+          <a class="header-cta" href="/contact/">Plan een gesprek <ArrowUpRight size={16} aria-hidden="true" /></a>
+        </nav>
+      </div>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="wordmark footer-wordmark" href="/">CF<span>·</span>MEDIA</a>
+          <p>SEO, GEO en webdesign. Helder werk voor betere vindbaarheid.</p>
+          <a href="mailto:[E-MAIL INVULLEN]">[E-MAIL INVULLEN]</a>
+        </div>
+        <div>
+          <h2>Diensten</h2>
+          {services.map((service) => <a href={service.href}>{service.label}</a>)}
+        </div>
+        <div>
+          <h2>Kennisbank</h2>
+          <a href="/kennisbank/seo/">SEO</a>
+          <a href="/kennisbank/geo/">GEO</a>
+          <a href="/kennisbank/webdesign/">Webdesign</a>
+        </div>
+        <div>
+          <h2>CF Media</h2>
+          <a href="/over-ons/">Over ons</a>
+          <a href="/contact/">Contact</a>
+          <a href="/privacyverklaring/">Privacyverklaring</a>
+          <span>KvK [NUMMER INVULLEN]</span>
+          <a href="[LINKEDIN-URL INVULLEN]">LinkedIn</a>
+        </div>
+      </div>
+      <div class="container footer-bottom"><span>© {new Date().getFullYear()} CF Media</span><span>Website en inhoud in ontwikkeling</span></div>
+    </footer>
+    <script>
+      const menuButton = document.querySelector<HTMLButtonElement>('.menu-toggle');
+      const navigation = document.querySelector<HTMLElement>('#main-nav');
+      const closeMenu = () => {
+        menuButton?.setAttribute('aria-expanded', 'false');
+        menuButton?.setAttribute('aria-label', 'Menu openen');
+        navigation?.classList.remove('is-open');
+      };
+
+      menuButton?.addEventListener('click', () => {
+        const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
+        menuButton.setAttribute('aria-expanded', String(!isOpen));
+        menuButton.setAttribute('aria-label', isOpen ? 'Menu openen' : 'Menu sluiten');
+        navigation?.classList.toggle('is-open', !isOpen);
+      });
+      navigation?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
+    </script>
+  </body>
+</html>
+
+<style>
+  .site-header { position: relative; z-index: 10; border-bottom: 1px solid var(--line); background: var(--paper); }
+  .header-inner { display: flex; min-height: 5rem; align-items: center; justify-content: space-between; gap: 2rem; }
+  .wordmark { color: var(--ink); font-size: 1.1rem; font-weight: 800; letter-spacing: 0.03em; text-decoration: none; }
+  .wordmark span { color: var(--coral); }
+  .main-nav { display: flex; align-items: center; gap: clamp(0.9rem, 2vw, 1.7rem); font-size: 0.9rem; }
+  .main-nav a, .nav-services summary { color: var(--ink); text-decoration: none; cursor: pointer; }
+  .main-nav a:hover, .nav-services summary:hover { color: var(--green); }
+  .nav-services { position: relative; }
+  .nav-services summary { list-style: none; }
+  .nav-services summary::-webkit-details-marker { display: none; }
+  .services-menu { position: absolute; top: 2rem; left: -1rem; display: grid; min-width: 12rem; gap: 0.1rem; padding: 0.5rem; border: 1px solid var(--line); background: var(--surface); box-shadow: 0 0.75rem 2rem #17231d20; }
+  .services-menu a { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem; }
+  .main-nav .header-cta { display: flex; align-items: center; gap: 0.4rem; padding: 0.7rem 0.9rem; background: var(--green); color: white; font-weight: 700; }
+  .menu-toggle { display: none; border: 0; background: transparent; color: var(--ink); }
+  .menu-close { display: none; }
+  .site-footer { padding-top: 4rem; border-top: 1px solid var(--line); background: var(--surface); }
+  .footer-grid { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 2rem; padding-bottom: 3rem; }
+  .footer-grid > div { display: flex; flex-direction: column; align-items: flex-start; gap: 0.65rem; }
+  .footer-grid h2 { margin: 0 0 0.4rem; font-size: 0.9rem; }
+  .footer-grid a, .footer-grid span { color: var(--muted); font-size: 0.9rem; text-decoration: none; }
+  .footer-grid a:hover { color: var(--green); }
+  .footer-wordmark { color: var(--ink) !important; }
+  .footer-bottom { display: flex; justify-content: space-between; gap: 1rem; padding-block: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.8rem; }
+  @media (max-width: 900px) {
+    .menu-toggle { display: inline-flex; min-width: 2.75rem; min-height: 2.75rem; align-items: center; justify-content: center; }
+    .main-nav { position: absolute; top: 100%; right: 0; left: 0; display: none; align-items: stretch; padding: 1rem 1.25rem 1.5rem; border-bottom: 1px solid var(--line); background: var(--paper); }
+    .main-nav.is-open { display: flex; flex-direction: column; }
+    .menu-toggle[aria-expanded='true'] .menu-open { display: none; }
+    .menu-toggle[aria-expanded='true'] .menu-close { display: block; }
+    .services-menu { position: static; margin-top: 0.5rem; box-shadow: none; }
+    .main-nav .header-cta { justify-content: center; }
+    .footer-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 1.5rem 1rem; }
+    .footer-grid > div:first-child { grid-column: 1 / -1; }
+    .footer-bottom { flex-direction: column; }
+  }
+</style>

@@ -1,0 +1,24 @@
+{
+  "name": "cfmedia-website",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev --host 0.0.0.0 --port 4321",
+    "build": "astro check && astro build",
+    "preview": "astro preview --host 0.0.0.0 --port 4321"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@astrojs/mdx": "latest",
+    "@astrojs/sitemap": "latest",
+    "@fontsource-variable/dm-sans": "latest",
+    "@lucide/astro": "latest",
+    "@tailwindcss/vite": "latest",
+    "astro": "latest",
+    "tailwindcss": "latest"
+  },
+  "devDependencies": {
+    "@astrojs/check": "latest",
+    "typescript": "^6.0.3"
+  }
+}

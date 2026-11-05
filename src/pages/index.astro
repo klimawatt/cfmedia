@@ -1,0 +1,22 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+---
+
+<SiteLayout
+  title="CF Media | SEO, GEO en webdesign"
+  description="CF Media helpt je met SEO, GEO en webdesign. Samen maken we je website beter vindbaar en klaar voor je bezoekers."
+  canonical="https://www.cfmedia.nl/"
+>
+  <section class="container hero">
+    <p class="eyebrow">SEO · GEO · webdesign</p>
+    <h1>Een website die gevonden wordt én verder helpt.</h1>
+    <p class="intro">CF Media helpt je groeien met vindbaarheid in zoekmachines en AI, en met websites die prettig werken.</p>
+    <a class="button-primary" href="/contact/">Plan een gesprek <span aria-hidden="true">↗</span></a>
+  </section>
+</SiteLayout>
+
+<style>
+  .hero { display: grid; min-height: 70vh; align-content: center; justify-items: start; padding-block: 5rem; }
+  h1 { max-width: 12ch; margin: 1rem 0; font-size: clamp(3rem, 7vw, 6.5rem); line-height: 0.98; }
+  .intro { max-width: 38rem; margin: 0 0 2rem; color: var(--muted); font-size: 1.2rem; line-height: 1.6; }
+</style>

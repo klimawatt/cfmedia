@@ -1,0 +1,15 @@
+# CF Media
+
+> CF Media is een Nederlands bureau voor SEO, GEO (vindbaarheid in AI-zoekmachines) en webdesign.
+
+Belangrijke pagina's:
+- [Home](https://www.cfmedia.nl/)
+- [Diensten](https://www.cfmedia.nl/diensten/)
+- [SEO](https://www.cfmedia.nl/diensten/seo/)
+- [GEO](https://www.cfmedia.nl/diensten/geo/)
+- [Webdesign](https://www.cfmedia.nl/diensten/webdesign/)
+- [Cases](https://www.cfmedia.nl/cases/)
+- [Kennisbank](https://www.cfmedia.nl/kennisbank/)
+- [Tarieven](https://www.cfmedia.nl/tarieven/)
+- [Over ons](https://www.cfmedia.nl/over-ons/)
+- [Contact](https://www.cfmedia.nl/contact/)
