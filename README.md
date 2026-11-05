@@ -44,6 +44,7 @@ De productiebuild is statisch en kan op Netlify of Vercel worden gehost. Stel de
 - Cases zijn Markdown-bestanden in `src/content/cases/` en gebruiken het schema in `src/content.config.ts`.
 - Kennisbankartikelen staan in `src/content/articles/{seo,geo,webdesign}/`.
 - Artikelen vereisen titel, beschrijving, auteur, `datePublished`, `dateModified`, categorie en dienst-tags.
+- Voeg optioneel `cover` en `coverAlt` toe voor een geoptimaliseerde artikelcover; `coverAlt` is verplicht zodra een cover is ingesteld.
 - De zes voorbeeldartikelen hebben `draft: true` en worden niet als pagina gebouwd. Vervang eerst de auteur, foto, datums en inhoud; zet daarna `draft: false` om het artikel te publiceren.
 - Cases op de site zijn invulopzetten. Vervang alle casevelden en verkrijg toestemming voordat je klantinformatie publiceert.
 

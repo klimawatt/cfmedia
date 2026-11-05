@@ -1,4 +1,5 @@
 ---
+import { ArrowUpRight } from '@lucide/astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import { breadcrumbSchema } from '../../utils/structured-data';
@@ -15,24 +16,31 @@ const structuredData = breadcrumbSchema(crumbs);
 <SiteLayout title="Kennisbank | CF Media" description="Lees inzichten over SEO, GEO en webdesign. Praktische uitleg voor betere vindbaarheid en websites die prettig werken." canonical="https://www.cfmedia.nl/kennisbank/" structuredData={structuredData}>
   <Breadcrumbs items={crumbs} />
   <header class="container page-hero">
-    <p class="eyebrow">Kennis en uitleg</p>
-    <h1>Kennisbank</h1>
-    <p>Korte, praktische uitleg over vindbaarheid en websites. Artikelen verschijnen nadat ze zijn gecontroleerd en afgerond.</p>
+    <div><p class="eyebrow">CF Media / kennisbank</p><h1>Kennis die je verder brengt.</h1><p>Korte uitleg en praktische inzichten over online vindbaarheid en websites. We publiceren artikelen zodra ze inhoudelijk zijn gecontroleerd.</p></div>
+    <div class="editorial-note"><span>CF / REDACTIE</span><strong>Helder antwoord.<br />Praktische volgende stap.</strong><span>SEO · GEO · WEB</span></div>
   </header>
   <section class="container category-list" aria-label="Kennisbankcategorieën">
-    {categories.map((category, index) => <a class="category-row" href={`/kennisbank/${category.slug}/`}><span>0{index + 1}</span><div><h2>{category.name}</h2><p>{category.description}</p></div><span class="arrow" aria-hidden="true">↗</span></a>)}
+    {categories.map((category, index) => <a class={`category-card tone-${index}`} href={`/kennisbank/${category.slug}/`}><span class="card-label">0{index + 1} / DOSSIER</span><span class="category-glyph" aria-hidden="true">{category.name.slice(0, 1)}</span><span class="card-content"><h2>{category.name}</h2><p>{category.description}</p><span class="card-link">Bekijk {category.name} <ArrowUpRight size={17} aria-hidden="true" /></span></span></a>)}
   </section>
 </SiteLayout>
 
 <style>
-  .page-hero { padding-block: 4rem 3rem; }
-  h1 { margin: 0.75rem 0; font-size: var(--type-h1); line-height: 1; }
-  .page-hero > p:last-child { max-width: 44rem; color: var(--muted); font-size: 1.15rem; line-height: 1.65; }
-  .category-list { padding-bottom: 6rem; }
-  .category-row { display: grid; grid-template-columns: 3rem 1fr auto; align-items: center; gap: 1.5rem; padding-block: 1.6rem; border-top: 1px solid var(--line); text-decoration: none; }
-  .category-row > span:first-child, .arrow { color: var(--green); font-weight: 700; }
-  h2 { margin: 0; font-size: var(--type-h2-small); }
-  .category-row p { margin: 0.5rem 0 0; color: var(--muted); }
-  .arrow { font-size: 1.3rem; }
-  @media (max-width: 520px) { .category-row { grid-template-columns: 2rem 1fr auto; gap: 0.75rem; } }
+  .page-hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(16rem, 0.7fr); align-items: center; gap: 3rem; padding-block: 3.5rem 4rem; }
+  h1 { max-width: 12ch; margin: 0.75rem 0; font-size: var(--type-h1); line-height: 1.02; }
+  .page-hero > div:first-child > p:last-child { max-width: 44rem; color: var(--muted); font-size: 1.1rem; line-height: 1.65; }
+  .editorial-note { display: flex; min-height: 15rem; flex-direction: column; justify-content: space-between; padding: 1.25rem; background: var(--green-bright); color: var(--ink); }
+  .editorial-note span { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; }
+  .editorial-note strong { font-size: 1.8rem; line-height: 1.1; }
+  .category-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8rem; padding-bottom: 6rem; }
+  .category-card { position: relative; display: flex; min-width: 0; min-height: 22rem; flex-direction: column; justify-content: space-between; overflow: hidden; padding: 1.15rem; color: #17231d; text-decoration: none; }
+  .tone-0 { background: #dcecff; }
+  .tone-1 { background: #c8ec7c; }
+  .tone-2 { background: #ffddd3; }
+  .card-label { position: relative; z-index: 1; font-size: 0.7rem; font-weight: 700; }
+  .category-glyph { position: absolute; top: 2rem; right: -0.5rem; color: #17231d17; font-size: 12rem; font-weight: 800; line-height: 1; }
+  .card-content { position: relative; z-index: 1; }
+  h2 { margin: 0; font-size: 2rem; }
+  .category-card p { max-width: 27ch; min-height: 3rem; margin: 0.5rem 0; line-height: 1.55; }
+  .card-link { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.65rem; font-size: 0.82rem; font-weight: 700; }
+  @media (max-width: 760px) { .page-hero { grid-template-columns: 1fr; gap: 1.5rem; } .category-list { grid-template-columns: 1fr; } .category-card { min-height: 17rem; } }
 </style>

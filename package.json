@@ -12,6 +12,7 @@
     "@astrojs/mdx": "latest",
     "@astrojs/sitemap": "latest",
     "@fontsource-variable/dm-sans": "latest",
+    "@fontsource-variable/space-grotesk": "latest",
     "@lucide/astro": "latest",
     "@tailwindcss/vite": "latest",
     "astro": "latest",

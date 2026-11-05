@@ -1,7 +1,10 @@
 ---
+import { ArrowUpRight } from '@lucide/astro';
+import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import SiteLayout from '../../../layouts/SiteLayout.astro';
+import seoDashboard from '../../../assets/seo-dashboard.jpg';
 import { breadcrumbSchema } from '../../../utils/structured-data';
 
 export async function getStaticPaths() {
@@ -26,23 +29,33 @@ const structuredData = breadcrumbSchema(crumbs);
 <SiteLayout title={`${details.name} kennisbank | CF Media`} description={details.description} canonical={`https://www.cfmedia.nl/kennisbank/${category}/`} structuredData={structuredData}>
   <Breadcrumbs items={crumbs} />
   <header class="container page-hero">
-    <p class="eyebrow">Kennisbank · {details.name}</p>
-    <h1>{details.name}</h1>
-    <p>{details.description}</p>
+    <div><p class="eyebrow">Kennisbank / {details.name}</p><h1>{details.name}<span> in beeld.</span></h1><p>{details.description} Artikelen met een gecontroleerde uitleg en duidelijke bronvermelding.</p><a class="hub-link" href={`/diensten/${category}/`}>Bekijk de {details.name}-dienst <ArrowUpRight size={17} aria-hidden="true" /></a></div>
+    <figure class="category-visual"><Image src={seoDashboard} alt="Laptop met een analyticsdashboard voor websiteverkeer" width={1440} height={960} format="webp" sizes="(max-width: 700px) 100vw, 46vw" loading="lazy" /><figcaption>Inzichten / {details.name}</figcaption></figure>
   </header>
   <section class="container article-list" aria-label={`Artikelen over ${details.name}`}>
-    {articles.length ? articles.map((article) => <article><p class="eyebrow">{details.name}</p><h2><a href={`/kennisbank/${category}/${article.id.split('/').at(-1)}/`}>{article.data.title}</a></h2><p>{article.data.description}</p></article>) : <p class="empty-state">Er zijn nog geen gepubliceerde artikelen in deze categorie.</p>}
+    {articles.length ? articles.map((article) => <article class="article-card">{article.data.cover && <a class="article-image" href={`/kennisbank/${category}/${article.id.split('/').at(-1)}/`} tabindex="-1" aria-hidden="true"><Image src={article.data.cover} alt="" width={article.data.cover.width} height={article.data.cover.height} format="webp" sizes="(max-width: 700px) 100vw, 50vw" loading="lazy" /></a>}<p class="eyebrow">{details.name} / Artikel</p><h2><a href={`/kennisbank/${category}/${article.id.split('/').at(-1)}/`}>{article.data.title}</a></h2><p>{article.data.description}</p><a class="article-read" href={`/kennisbank/${category}/${article.id.split('/').at(-1)}/`}>Lees artikel <ArrowUpRight size={16} aria-hidden="true" /></a></article>) : <div class="empty-state"><span class="eyebrow">Redactie / {details.name}</span><h2>De eerste artikelen worden voorbereid.</h2><p>We publiceren uitleg zodra inhoud en bronnen zijn gecontroleerd.</p><a class="hub-link" href={`/diensten/${category}/`}>Bekijk de {details.name}-dienst <ArrowUpRight size={17} aria-hidden="true" /></a></div>}
   </section>
 </SiteLayout>
 
 <style>
-  .page-hero { padding-block: 4rem 3rem; }
-  h1 { margin: 0.75rem 0; font-size: var(--type-h1); line-height: 1; }
-  .page-hero > p:last-child { max-width: 44rem; color: var(--muted); font-size: 1.15rem; line-height: 1.65; }
-  .article-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; padding-block: 1rem 6rem; }
-  article { padding-top: 1rem; border-top: 1px solid var(--line); }
-  h2 { margin: 0.5rem 0; font-size: 1.5rem; }
-  h2 a { text-decoration: none; }
-  article > p:last-child, .empty-state { color: var(--muted); line-height: 1.65; }
-  @media (max-width: 600px) { .article-list { grid-template-columns: 1fr; } }
+  .page-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.85fr); align-items: center; gap: 3rem; padding-block: 3rem 4rem; }
+  h1 { max-width: 11ch; margin: 0.75rem 0; font-size: var(--type-h1); line-height: 1; }
+  h1 span { color: var(--green); }
+  .page-hero > div > p:not(.eyebrow) { max-width: 42rem; color: var(--muted); font-size: 1.08rem; line-height: 1.65; }
+  .hub-link, .article-read { display: inline-flex; align-items: center; gap: 0.45rem; color: var(--green); font-size: 0.88rem; font-weight: 700; text-underline-offset: 0.15em; }
+  .category-visual { position: relative; margin: 0; overflow: hidden; background: var(--green-bright); }
+  .category-visual :global(img) { display: block; width: 100%; aspect-ratio: 1.35; object-fit: cover; }
+  .category-visual figcaption { padding: 0.75rem 1rem; font-size: 0.75rem; font-weight: 700; }
+  .article-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 1rem; padding-block: 0 6rem; }
+  .article-card { min-width: 0; padding: 1rem; border-top: 2px solid var(--green); background: var(--surface); }
+  .article-image { display: block; margin: -1rem -1rem 1rem; overflow: hidden; background: var(--green-bright); }
+  .article-image :global(img) { display: block; width: 100%; aspect-ratio: 1.7; object-fit: cover; transition: transform 200ms ease; }
+  .article-image:hover :global(img) { transform: scale(1.02); }
+  .article-card h2 { margin: 0.5rem 0; font-size: 1.5rem; line-height: 1.15; }
+  .article-card h2 a { color: var(--ink); text-decoration: none; }
+  .article-card > p:not(.eyebrow) { color: var(--muted); line-height: 1.6; }
+  .empty-state { grid-column: 1 / -1; padding: 2rem; border-left: 4px solid var(--coral); background: var(--surface); }
+  .empty-state h2 { max-width: 24ch; margin: 0.5rem 0; font-size: 1.7rem; }
+  .empty-state p { color: var(--muted); line-height: 1.6; }
+  @media (max-width: 760px) { .page-hero { grid-template-columns: 1fr; gap: 1.5rem; } .article-list { grid-template-columns: 1fr; } }
 </style>

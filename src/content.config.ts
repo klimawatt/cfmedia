@@ -23,12 +23,17 @@ const articles = defineCollection({
       teamSlug: z.string().min(1),
       photo: image(),
     }),
+    cover: image().optional(),
+    coverAlt: z.string().optional(),
     datePublished: dateOrPlaceholder,
     dateModified: dateOrPlaceholder,
     category: z.enum(['seo', 'geo', 'webdesign']),
     serviceTags: z.array(serviceTag),
     draft: z.boolean().default(false),
   }).superRefine((article, context) => {
+    if (article.cover && !article.coverAlt?.trim()) {
+      context.addIssue({ code: 'custom', message: 'coverAlt is verplicht als een artikelcover wordt gebruikt.', path: ['coverAlt'] });
+    }
     if (!article.draft) {
       for (const field of ['datePublished', 'dateModified'] as const) {
         if (article[field] === '[DATUM INVULLEN]') {

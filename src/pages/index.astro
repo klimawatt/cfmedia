@@ -1,6 +1,8 @@
 ---
-import { ArrowUpRight } from '@lucide/astro';
+import { ArrowUpRight, PanelsTopLeft, Search, Sparkles } from '@lucide/astro';
+import { Image } from 'astro:assets';
 import SiteLayout from '../layouts/SiteLayout.astro';
+import seoDashboard from '../assets/seo-dashboard.jpg';
 
 const services = [
   { number: '01', name: 'SEO', description: 'Zorg dat je gevonden wordt op de vragen die ertoe doen.', href: '/diensten/seo/', tone: 'blue' },
@@ -61,7 +63,17 @@ const organization = {
     <section class="container services section-space" aria-labelledby="services-heading">
       <div class="section-heading"><p class="eyebrow">Waar we aan werken</p><h2 id="services-heading">Drie disciplines.<br />Eén sterke basis.</h2><p>Je kiest wat je nodig hebt. We verbinden de onderdelen waar dat zinvol is.</p></div>
       <div class="service-grid">
-        {services.map((service) => <a class={`service-block ${service.tone}`} href={service.href}><span class="block-top"><span>{service.number} / DIENST</span><ArrowUpRight size={20} aria-hidden="true" /></span><span class="block-symbol" aria-hidden="true">{service.number === '01' ? '⌕' : service.number === '02' ? '✳' : '▤'}</span><h3>{service.name}</h3><p>{service.description}</p><span class="block-link">Meer over {service.name} <ArrowUpRight size={16} aria-hidden="true" /></span></a>)}
+        {services.map((service) => <a class={`service-block ${service.tone}`} href={service.href}><span class="block-top"><span>{service.number} / DIENST</span><ArrowUpRight size={20} aria-hidden="true" /></span><span class="block-symbol" aria-hidden="true">{service.number === '01' ? <Search size={36} stroke-width={1.5} /> : service.number === '02' ? <Sparkles size={36} stroke-width={1.5} /> : <PanelsTopLeft size={36} stroke-width={1.5} />}</span><h3>{service.name}</h3><p>{service.description}</p><span class="block-link">Meer over {service.name} <ArrowUpRight size={16} aria-hidden="true" /></span></a>)}
+      </div>
+    </section>
+
+    <section class="signal-section" aria-labelledby="signal-heading">
+      <div class="container signal-grid">
+        <figure class="signal-visual">
+          <Image src={seoDashboard} alt="Laptop met een dashboard met website- en bezoekersgegevens" width={1440} height={960} format="webp" sizes="(max-width: 760px) 100vw, 58vw" loading="lazy" />
+          <figcaption><span>DATA / CONTEXT / KEUZE</span><span>Een goed advies begint met kijken.</span></figcaption>
+        </figure>
+        <div class="signal-copy"><p class="eyebrow">Eerst begrijpen</p><h2 id="signal-heading">Richting ontstaat wanneer je weet waar je staat.</h2><p>We kijken naar je website, de vragen van je doelgroep en de plek waar je kansen laat liggen. Zo wordt de volgende stap concreet.</p><a class="text-link" href="/diensten/seo/">Bekijk onze SEO-aanpak <ArrowUpRight size={17} aria-hidden="true" /></a></div>
       </div>
     </section>
 
@@ -154,6 +166,15 @@ const organization = {
   .service-block h3 { margin: 0.75rem 0 0.4rem; font-size: 1.55rem; }
   .service-block p { margin: 0 0 1.25rem; color: inherit; font-size: 0.9rem; line-height: 1.5; }
   .block-link { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: auto; font-size: 0.8rem; font-weight: 700; text-underline-offset: 0.15em; }
+  .signal-section { padding-block: 4rem; background: var(--surface); }
+  .signal-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(17rem, 0.8fr); align-items: center; gap: 3rem; }
+  .signal-visual { position: relative; min-width: 0; margin: 0; overflow: hidden; background: var(--green-bright); }
+  .signal-visual :global(img) { display: block; width: 100%; aspect-ratio: 1.5; object-fit: cover; }
+  .signal-visual figcaption { display: flex; justify-content: space-between; gap: 1rem; padding: 0.8rem 1rem; color: var(--ink); font-size: 0.72rem; }
+  .signal-visual figcaption span:first-child { font-weight: 700; }
+  .signal-copy h2 { max-width: 13ch; margin: 0.65rem 0; font-size: 2.7rem; line-height: 1.08; }
+  .signal-copy > p:not(.eyebrow) { color: var(--muted); line-height: 1.65; }
+  .signal-copy .text-link { margin-top: 0.5rem; }
   .case-section { padding-block: 5rem; background: var(--green-bright); }
   .case-layout { display: grid; grid-template-columns: 0.85fr 1.15fr; align-items: center; gap: 3rem; }
   .case-copy > p:not(.eyebrow) { color: var(--ink); }
@@ -203,7 +224,7 @@ const organization = {
   }
   @media (max-width: 760px) {
     .hero { padding-top: 1.5rem; }
-    .hero-grid, .case-layout, .partners, .process-inner { grid-template-columns: 1fr; }
+    .hero-grid, .case-layout, .partners, .process-inner, .signal-grid { grid-template-columns: 1fr; }
     .hero-copy { padding-block: 2rem 0.5rem; }
     h1 { max-width: 12ch; font-size: 3.4rem; }
     .hero-index { margin-top: 2rem; }
@@ -211,6 +232,8 @@ const organization = {
     .hero-bottom { margin-top: 1.5rem; }
     .section-heading h2, .case-copy h2, .partners h2, .process-heading h2, .knowledge-inner h2, .final-cta h2 { font-size: 2.25rem; }
     .case-block { min-height: 16rem; }
+    .signal-section { padding-block: 3rem; }
+    .signal-copy h2 { font-size: 2.25rem; }
     .partners { gap: 1.5rem; }
     .knowledge-inner { align-items: flex-start; flex-direction: column; }
     .meeting-cta-grid { grid-template-columns: 1fr; gap: 2rem; }

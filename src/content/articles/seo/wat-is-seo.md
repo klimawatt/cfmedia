@@ -6,6 +6,8 @@ author:
   jobTitle: "[FUNCTIE INVULLEN]"
   teamSlug: "teamlid-invullen"
   photo: "../../../assets/team-placeholder.svg"
+cover: "../../../assets/seo-dashboard.jpg"
+coverAlt: "Laptop met een analyticsdashboard voor websiteverkeer"
 datePublished: "[DATUM INVULLEN]"
 dateModified: "[DATUM INVULLEN]"
 category: "seo"
