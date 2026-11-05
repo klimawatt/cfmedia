@@ -1,0 +1,44 @@
+---
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { services } from '../../data/services';
+import { breadcrumbSchema } from '../../utils/structured-data';
+
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Diensten', href: '/diensten/' }];
+const structuredData = breadcrumbSchema(crumbs);
+---
+
+<SiteLayout title="Diensten | CF Media" description="Bekijk de diensten van CF Media: SEO, GEO en webdesign. Kies de expertise die aansluit bij je website en doelen." canonical="https://www.cfmedia.nl/diensten/" structuredData={structuredData}>
+  <Breadcrumbs items={crumbs} />
+  <header class="container page-hero">
+    <p class="eyebrow">Waar we aan werken</p>
+    <h1>Diensten voor vindbaarheid en websites</h1>
+    <p>Van technische vindbaarheid tot een nieuwe website. Je kiest een dienst die past bij de vraag waar je nu mee zit.</p>
+  </header>
+  <section class="container service-list" aria-label="Diensten">
+    {services.map((service, index) => (
+      <article class="service-row">
+        <span class="service-number">0{index + 1}</span>
+        <div><h2><a href={`/diensten/${service.slug}/`}>{service.name}</a></h2><p>{service.summary}</p></div>
+        <a class="text-link" href={`/diensten/${service.slug}/`}>Bekijk {service.name}<span aria-hidden="true"> ↗</span></a>
+      </article>
+    ))}
+  </section>
+  <section class="container case-note"><p class="eyebrow">Uit de praktijk</p><p>[CASE: klantnaam + resultaat invullen]</p><a href="/cases/">Bekijk de case-opzet <span aria-hidden="true">↗</span></a></section>
+</SiteLayout>
+
+<style>
+  .page-hero { padding-block: 4rem 3rem; }
+  h1 { max-width: 15ch; margin: 0.75rem 0; font-size: clamp(2.6rem, 6vw, 5rem); line-height: 1.02; }
+  .page-hero > p:last-child { max-width: 44rem; color: var(--muted); font-size: 1.15rem; line-height: 1.65; }
+  .service-list { padding-bottom: 4rem; }
+  .service-row { display: grid; grid-template-columns: 3rem 1fr auto; align-items: center; gap: 1.5rem; padding-block: 1.8rem; border-top: 1px solid var(--line); }
+  .service-number { color: var(--green); font-size: 0.85rem; font-weight: 700; }
+  h2 { margin: 0; font-size: clamp(1.5rem, 3vw, 2rem); }
+  h2 a { text-decoration: none; }
+  .service-row p { max-width: 45rem; margin: 0.5rem 0 0; color: var(--muted); line-height: 1.6; }
+  .text-link, .case-note a { color: var(--green); font-weight: 700; text-underline-offset: 0.2em; }
+  .case-note { display: grid; grid-template-columns: 1fr 2fr 1fr; align-items: center; gap: 1rem; padding-block: 2rem; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .case-note p { margin: 0; }
+  @media (max-width: 650px) { .service-row { grid-template-columns: 2rem 1fr; gap: 0.8rem; } .service-row .text-link { grid-column: 2; } .case-note { grid-template-columns: 1fr; } }
+</style>

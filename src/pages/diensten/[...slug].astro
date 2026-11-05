@@ -1,0 +1,113 @@
+---
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import FaqList from '../../components/FaqList.astro';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { allServicePages, services, type ServiceHub, type ServicePage } from '../../data/services';
+import { breadcrumbSchema, faqSchema } from '../../utils/structured-data';
+
+export function getStaticPaths() {
+  return allServicePages.map((service) => ({ params: { slug: service.slug }, props: { service } }));
+}
+
+const service = Astro.props.service as ServicePage | ServiceHub;
+const isHub = (item: ServicePage | ServiceHub): item is ServiceHub => 'subservices' in item;
+const isServiceHub = isHub(service);
+const hub = services.find((item) => item.slug === service.hub)!;
+const crumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Diensten', href: '/diensten/' },
+  ...(isServiceHub ? [] : [{ label: hub.name, href: `/diensten/${hub.slug}/` }]),
+  { label: service.name, href: `/diensten/${service.slug}/` },
+];
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: service.name,
+  description: service.summary,
+  serviceType: service.name,
+  url: new URL(`/diensten/${service.slug}/`, 'https://www.cfmedia.nl').href,
+  provider: { '@type': 'Organization', name: 'CF Media', url: 'https://www.cfmedia.nl/' },
+};
+const structuredData = [breadcrumbSchema(crumbs), serviceSchema, ...(isServiceHub ? [faqSchema(service.faq)] : [])];
+---
+
+<SiteLayout title={service.title} description={service.description} canonical={`https://www.cfmedia.nl/diensten/${service.slug}/`} structuredData={structuredData}>
+  <Breadcrumbs items={crumbs} />
+  <header class="container page-hero">
+    <p class="eyebrow">CF Media · {hub.name}</p>
+    <h1>{isServiceHub && service.slug === 'geo' ? 'GEO: vindbaar in ChatGPT, Perplexity en Google AI Overviews' : service.name}</h1>
+    <p class="summary">{service.summary}</p>
+  </header>
+
+  {isServiceHub ? (
+    <>
+      <section class="container intro-grid">
+        <div><h2>Wat is {service.name}?</h2><p>{service.approach}</p></div>
+        <div><h2>Voor wie?</h2><p>{service.audience}</p></div>
+      </section>
+      <section class="container deliverables">
+        <div><p class="eyebrow">Wat je krijgt</p><h2>Werk dat je verder helpt</h2></div>
+        <ul>{service.deliverables.map((item) => <li>{item}</li>)}</ul>
+      </section>
+      <section class="container process">
+        <p class="eyebrow">Werkwijze</p><h2>Een helder traject</h2>
+        <ol>{service.process.map((step) => <li>{step}</li>)}</ol>
+      </section>
+      <section class="container subservices">
+        <p class="eyebrow">{service.name}</p><h2>Waar wil je mee beginnen?</h2>
+        <div class="subservice-grid">
+          {service.subservices.map((item) => <article><h3><a href={`/diensten/${item.slug}/`}>{item.name}</a></h3><p>{item.summary}</p><a class="text-link" href={`/diensten/${item.slug}/`}>Meer over {item.name} <span aria-hidden="true">↗</span></a></article>)}
+        </div>
+      </section>
+      <section class="container knowledge-link">
+        <div><p class="eyebrow">Verder lezen</p><h2>Inzichten over {service.name}</h2><p>Bekijk de kennisbankcategorie voor artikelen. Concepten worden pas gepubliceerd na redactie.</p></div>
+        <a class="text-link" href={`/kennisbank/${service.category}/`}>Naar de {service.name}-kennisbank <span aria-hidden="true">↗</span></a>
+      </section>
+      <section class="container faq-section"><p class="eyebrow">Veelgestelde vragen</p><h2>Vragen over {service.name}</h2><FaqList questions={service.faq} /></section>
+    </>
+  ) : (
+    <>
+      <section class="container detail-grid">
+        <div><p class="eyebrow">Het probleem</p><h2>Waar je tegenaan loopt</h2><p>{service.problem}</p></div>
+        <div><p class="eyebrow">De aanpak</p><h2>Wat we doen</h2><p>{service.approach}</p></div>
+      </section>
+      <section class="container deliverables">
+        <div><p class="eyebrow">Wat je krijgt</p><h2>Concreet en inzichtelijk</h2></div>
+        <ul>{service.deliverables.map((item) => <li>{item}</li>)}</ul>
+      </section>
+      <section class="container faq-section"><p class="eyebrow">Veelgestelde vragen</p><h2>Over {service.name.toLowerCase()}</h2><FaqList questions={service.faq} /></section>
+    </>
+  )}
+
+  <section class="container service-cta"><p class="eyebrow">Een vraag over {service.name}?</p><h2>Leg je situatie aan ons voor.</h2><a class="button-primary" href="/contact/">Plan een gesprek <span aria-hidden="true">↗</span></a></section>
+</SiteLayout>
+
+<style>
+  .page-hero { padding-block: 3rem 4rem; }
+  h1 { max-width: 18ch; margin: 0.8rem 0 1rem; font-size: clamp(2.5rem, 6vw, 5.5rem); line-height: 1.02; }
+  .summary { max-width: 48rem; margin: 0; color: var(--muted); font-size: clamp(1.1rem, 2vw, 1.35rem); line-height: 1.6; }
+  h2 { margin: 0.4rem 0 0.8rem; font-size: clamp(1.5rem, 3vw, 2.2rem); line-height: 1.15; }
+  .intro-grid, .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3rem; padding-block: 3rem; border-top: 1px solid var(--line); }
+  .intro-grid p:last-child, .detail-grid p:last-child { max-width: 36rem; color: var(--muted); line-height: 1.7; }
+  .deliverables { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding-block: 3rem; border-top: 1px solid var(--line); }
+  .deliverables ul { margin: 0; padding: 0; list-style: none; }
+  .deliverables li { padding: 0.8rem 0; border-bottom: 1px solid var(--line); }
+  .deliverables li::before { content: '↗'; margin-right: 0.75rem; color: var(--green); }
+  .process, .subservices, .faq-section { padding-block: 4rem; border-top: 1px solid var(--line); }
+  .process ol { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 2rem 0 0; padding: 0; list-style: none; counter-reset: steps; }
+  .process li { min-height: 8rem; padding: 1rem; border-top: 2px solid var(--green); background: var(--surface); counter-increment: steps; line-height: 1.5; }
+  .process li::before { content: '0' counter(steps); display: block; margin-bottom: 1.2rem; color: var(--green); font-size: 0.8rem; font-weight: 700; }
+  .subservice-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2rem; }
+  .subservice-grid article { padding-top: 1rem; border-top: 1px solid var(--line); }
+  .subservice-grid h3 { margin: 0; font-size: 1.25rem; }
+  .subservice-grid h3 a { text-decoration: none; }
+  .subservice-grid p, .knowledge-link p:last-child { color: var(--muted); line-height: 1.6; }
+  .text-link { color: var(--green); font-weight: 700; text-underline-offset: 0.2em; }
+  .knowledge-link { display: flex; align-items: center; justify-content: space-between; gap: 2rem; padding-block: 2.5rem; border-top: 1px solid var(--line); }
+  .knowledge-link p:last-child { max-width: 42rem; margin-bottom: 0; }
+  .faq-section h2 { margin-bottom: 2rem; }
+  .service-cta { margin-block: 2rem 5rem; padding: clamp(1.5rem, 5vw, 4rem); background: var(--green-bright); }
+  .service-cta h2 { max-width: 16ch; margin: 0 0 1.5rem; font-size: clamp(2rem, 4vw, 3.5rem); }
+  @media (max-width: 700px) { .intro-grid, .detail-grid, .deliverables { grid-template-columns: 1fr; gap: 1.2rem; } .process ol { grid-template-columns: repeat(2, 1fr); } .subservice-grid { grid-template-columns: 1fr; } .knowledge-link { align-items: flex-start; flex-direction: column; } }
+  @media (max-width: 420px) { .process ol { grid-template-columns: 1fr; } }
+</style>
