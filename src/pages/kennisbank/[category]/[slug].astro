@@ -7,7 +7,7 @@ import { allServicePages } from '../../../data/services';
 import { breadcrumbSchema } from '../../../utils/structured-data';
 
 export async function getStaticPaths() {
-  const articles = await getCollection('articles', ({ data }) => !data.draft);
+  const articles = await getCollection('articles', ({ data }) => !data.draft || import.meta.env.DEV);
   return articles.map((article) => ({
     params: { category: article.data.category, slug: article.id.split('/').at(-1)! },
     props: { article },
@@ -15,6 +15,7 @@ export async function getStaticPaths() {
 }
 
 const { article } = Astro.props;
+const isDraftPreview = article.data.draft;
 const slug = article.id.split('/').at(-1)!;
 const { Content } = await render(article);
 const crumbs = [
@@ -24,29 +25,33 @@ const crumbs = [
   { label: article.data.title, href: `/kennisbank/${article.data.category}/${slug}/` },
 ];
 const services = article.data.serviceTags.map((tag) => allServicePages.find((service) => service.slug === tag || service.slug.endsWith(`/${tag}`))).filter((service) => service !== undefined);
-const published = new Date(article.data.datePublished);
-const modified = new Date(article.data.dateModified);
-const formatDate = (date: Date) => new Intl.DateTimeFormat('nl-NL', { dateStyle: 'long' }).format(date);
+const formatDate = (value: string) => {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat('nl-NL', { dateStyle: 'long' }).format(date);
+};
+const publishedDate = /^\d{4}-\d{2}-\d{2}$/.test(article.data.datePublished) ? article.data.datePublished : undefined;
+const modifiedDate = /^\d{4}-\d{2}-\d{2}$/.test(article.data.dateModified) ? article.data.dateModified : undefined;
 const canonical = `https://www.cfmedia.nl/kennisbank/${article.data.category}/${slug}/`;
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: article.data.title,
+  description: article.data.description,
+  datePublished: article.data.datePublished,
+  dateModified: article.data.dateModified,
+  author: {
+    '@type': 'Person',
+    name: article.data.author.name,
+    jobTitle: article.data.author.jobTitle,
+    image: new URL(article.data.author.photo.src, Astro.site).href,
+    url: new URL(`/over-ons/${article.data.author.teamSlug}/`, Astro.site).href,
+  },
+  publisher: { '@type': 'Organization', name: 'CF Media', url: 'https://www.cfmedia.nl/' },
+  mainEntityOfPage: canonical,
+};
 const structuredData = [
   breadcrumbSchema(crumbs),
-  {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: article.data.title,
-    description: article.data.description,
-    datePublished: article.data.datePublished,
-    dateModified: article.data.dateModified,
-    author: {
-      '@type': 'Person',
-      name: article.data.author.name,
-      jobTitle: article.data.author.jobTitle,
-      image: new URL(article.data.author.photo.src, Astro.site).href,
-      url: new URL(`/over-ons/${article.data.author.teamSlug}/`, Astro.site).href,
-    },
-    publisher: { '@type': 'Organization', name: 'CF Media', url: 'https://www.cfmedia.nl/' },
-    mainEntityOfPage: canonical,
-  },
+  ...(!isDraftPreview ? [articleSchema] : []),
 ];
 ---
 
@@ -54,56 +59,61 @@ const structuredData = [
   <div class="container article-shell"><Breadcrumbs items={crumbs} /></div>
   <header class="container article-header">
     <div class="article-heading">
+      {isDraftPreview && <p class="draft-banner">Conceptpreview / niet gepubliceerd</p>}
       <p class="category-label"><span class="category-dot" aria-hidden="true"></span> Kennisbank / {article.data.category}</p>
       <h1>{article.data.title}</h1>
       <p class="summary">{article.data.description}</p>
-      <div class="article-meta">
-        <div class="byline"><Image src={article.data.author.photo} alt={`Portret van ${article.data.author.name}`} width={56} height={56} /><div><span>Geschreven door <a href={`/over-ons/${article.data.author.teamSlug}/`}>{article.data.author.name}</a></span><span>{article.data.author.jobTitle}</span></div></div>
-        <div class="date-meta"><span>Gepubliceerd <time datetime={article.data.datePublished}>{formatDate(published)}</time></span><span>Bijgewerkt <time datetime={article.data.dateModified}>{formatDate(modified)}</time></span></div>
-      </div>
     </div>
     {article.data.cover && <figure class="article-cover"><Image src={article.data.cover} alt={article.data.coverAlt ?? ''} width={article.data.cover.width} height={article.data.cover.height} format="webp" sizes="(max-width: 760px) 100vw, 76rem" loading="eager" /><figcaption>{article.data.coverAlt}</figcaption></figure>}
+    <div class="author-strip">
+      <div class="byline"><Image src={article.data.author.photo} alt={`Portret van ${article.data.author.name}`} width={56} height={56} /><div><span>Geschreven door <a href={`/over-ons/${article.data.author.teamSlug}/`}>{article.data.author.name}</a></span><span>{article.data.author.jobTitle}</span></div></div>
+      <div class="date-meta"><span>Gepubliceerd <time datetime={publishedDate}>{formatDate(article.data.datePublished)}</time></span><span>Bijgewerkt <time datetime={modifiedDate}>{formatDate(article.data.dateModified)}</time></span></div>
+    </div>
   </header>
-  <article class="container article-layout">
-    <div class="article-body"><Content /></div>
-    <aside class="article-sidebar">
-      <div class="author-box"><p class="eyebrow">Over de auteur</p><Image src={article.data.author.photo} alt={`Portret van ${article.data.author.name}`} width={88} height={88} /><h2>{article.data.author.name}</h2><p>{article.data.author.jobTitle}</p><a href={`/over-ons/${article.data.author.teamSlug}/`}>Bekijk het profiel <span aria-hidden="true">↗</span></a></div>
-      {services.length > 0 && <div class="related-services"><p class="eyebrow">Verder lezen</p><h2>Werk verder aan {article.data.category}</h2><ul>{services.map((service) => <li><a href={`/diensten/${service.slug}/`}>{service.name} <span aria-hidden="true">↗</span></a></li>)}</ul></div>}
-    </aside>
+  <article class="article-body">
+    <Content />
+    <section class="author-bio" aria-label="Over de auteur">
+      <Image src={article.data.author.photo} alt={`Portret van ${article.data.author.name}`} width={80} height={80} />
+      <div><p class="eyebrow">Over de auteur</p><h2>{article.data.author.name}</h2><p>{article.data.author.jobTitle}</p><a href={`/over-ons/${article.data.author.teamSlug}/`}>Bekijk het profiel <span aria-hidden="true">↗</span></a></div>
+    </section>
+    {services.length > 0 && <nav class="related-services" aria-label="Gerelateerde diensten"><span class="eyebrow">Verder lezen</span><strong>Werk verder aan {article.data.category}</strong><ul>{services.map((service) => <li><a href={`/diensten/${service.slug}/`}>{service.name} <span aria-hidden="true">↗</span></a></li>)}</ul></nav>}
   </article>
 </SiteLayout>
 
 <style>
   .article-shell { border-bottom: 1px solid var(--line); }
-  .article-header { padding-block: 2.5rem 3rem; }
-  .article-heading { max-width: 66rem; margin-inline: auto; }
+  .article-header { padding-block: 2.5rem 0; }
+  .article-heading { max-width: 64rem; margin-inline: auto; }
+  .draft-banner { display: inline-block; margin: 0 0 1rem; padding: 0.4rem 0.65rem; background: #ffddd3; color: #17231d; font-size: 0.75rem; font-weight: 700; }
   .category-label { display: flex; align-items: center; gap: 0.55rem; margin: 0 0 1rem; color: var(--green); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
   .category-dot { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--coral); }
-  h1 { max-width: 17ch; margin: 0.7rem 0 1rem; font-size: var(--type-h1); line-height: 1.03; }
-  .summary { max-width: 54rem; margin: 0; color: var(--muted); font-size: 1.2rem; line-height: 1.6; }
-  .article-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.25rem 2rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  h1 { max-width: 18ch; margin: 0.7rem 0 1rem; font-size: var(--type-h1); line-height: 1.02; }
+  .summary { max-width: 56rem; margin: 0; color: var(--muted); font-size: 1.2rem; line-height: 1.6; }
+  .article-cover { position: relative; left: 50%; width: min(86rem, calc(100vw - 2rem)); margin: 2.5rem 0 0; overflow: hidden; background: var(--green-bright); transform: translateX(-50%); }
+  .article-cover :global(img) { display: block; width: 100%; max-height: 42rem; aspect-ratio: 1.9; object-fit: cover; }
+  .article-cover figcaption { padding: 0.75rem 1rem; color: var(--muted); font-size: 0.75rem; }
+  .author-strip { display: flex; max-width: 72rem; align-items: center; justify-content: space-between; gap: 1.25rem 2rem; margin: 0 auto; padding-block: 1rem; border-bottom: 1px solid var(--line); }
   .byline { display: flex; align-items: center; gap: 0.75rem; }
-  .byline :global(img) { width: 3.5rem; height: 3.5rem; object-fit: cover; }
+  .byline :global(img) { width: 3.5rem; height: 3.5rem; border-radius: 50%; object-fit: cover; }
   .byline div, .date-meta { display: grid; gap: 0.25rem; font-size: 0.82rem; }
   .byline div span:last-child, .date-meta { color: var(--muted); }
   .byline a { color: var(--ink); font-weight: 700; text-underline-offset: 0.15em; }
   .date-meta { grid-template-columns: repeat(2, auto); gap: 0.4rem 1rem; }
-  .article-cover { margin: 2.5rem 0 0; overflow: hidden; background: var(--green-bright); }
-  .article-cover :global(img) { display: block; width: 100%; max-height: 36rem; aspect-ratio: 1.9; object-fit: cover; }
-  .article-cover figcaption { padding: 0.75rem 1rem; color: var(--muted); font-size: 0.75rem; }
-  .article-layout { display: grid; grid-template-columns: minmax(0, 46rem) minmax(14rem, 18rem); justify-content: center; align-items: start; gap: 4rem; padding-block: 3.5rem 6rem; }
-  .article-body { min-width: 0; color: var(--ink); font-size: 1.05rem; line-height: 1.8; }
-  .article-body :global(h2) { margin: 2.5rem 0 0.75rem; font-size: 1.8rem; line-height: 1.15; }
-  .article-body :global(h3) { margin-top: 2rem; font-size: 1.3rem; }
+  .article-body { width: min(calc(100% - 2rem), 48rem); margin-inline: auto; padding-block: 3.5rem 6rem; color: var(--ink); font-size: 1.05rem; line-height: 1.8; }
+  .article-body :global(p) { margin-block: 0 1.4rem; }
+  .article-body :global(h2) { margin: 2.6rem 0 0.75rem; font-size: 1.85rem; line-height: 1.14; }
+  .article-body :global(h3) { margin: 2rem 0 0.65rem; font-size: 1.3rem; }
   .article-body :global(a) { color: var(--green); text-underline-offset: 0.2em; }
-  .article-sidebar { position: sticky; top: 1.5rem; display: grid; gap: 1.5rem; }
-  .author-box, .related-services { padding: 1.1rem; border-top: 3px solid var(--green); background: var(--surface); }
-  .author-box :global(img) { width: 5.5rem; height: 5.5rem; margin-block: 0.5rem; object-fit: cover; }
-  .author-box h2, .related-services h2 { margin: 0.25rem 0; font-size: 1.15rem; }
-  .author-box p:not(.eyebrow) { margin: 0.35rem 0 0.8rem; color: var(--muted); font-size: 0.9rem; }
-  .author-box a, .related-services a { color: var(--green); font-size: 0.88rem; font-weight: 700; text-underline-offset: 0.15em; }
-  .related-services ul { display: grid; gap: 0.65rem; margin: 1rem 0 0; padding: 0; list-style: none; }
-  .related-services li a { display: flex; justify-content: space-between; gap: 0.5rem; text-decoration: none; }
-  @media (max-width: 800px) { .article-layout { grid-template-columns: 1fr; gap: 2rem; } .article-sidebar { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 560px) { .article-meta, .date-meta { grid-template-columns: 1fr; justify-content: start; } .article-cover :global(img) { aspect-ratio: 1.3; } .article-sidebar { grid-template-columns: 1fr; } }
+  .article-body :global(blockquote) { margin: 2rem 0; padding: 1.25rem 1.5rem; border-left: 4px solid var(--coral); background: var(--surface); font-family: 'Space Grotesk Variable', sans-serif; font-size: 1.25rem; line-height: 1.5; }
+  .author-bio { display: grid; grid-template-columns: 5rem 1fr; align-items: center; gap: 1rem; margin-top: 3rem; padding-block: 1.5rem; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .author-bio :global(img) { width: 5rem; height: 5rem; border-radius: 50%; object-fit: cover; }
+  .author-bio .eyebrow, .author-bio h2, .author-bio p { margin: 0.15rem 0; }
+  .author-bio h2 { font-size: 1.2rem; }
+  .author-bio p:not(.eyebrow) { color: var(--muted); font-size: 0.9rem; }
+  .author-bio a { font-size: 0.88rem; font-weight: 700; }
+  .related-services { display: grid; grid-template-columns: 0.8fr 1.2fr; align-items: center; gap: 1rem 2rem; margin-top: 2rem; padding: 1.25rem; background: var(--green-bright); }
+  .related-services > strong { font-family: 'Space Grotesk Variable', sans-serif; font-size: 1.15rem; }
+  .related-services ul { display: flex; flex-wrap: wrap; gap: 0.7rem 1.2rem; margin: 0; padding: 0; list-style: none; }
+  .related-services a { color: var(--ink); font-size: 0.88rem; font-weight: 700; text-underline-offset: 0.15em; }
+  @media (max-width: 760px) { .author-strip { align-items: flex-start; flex-direction: column; } .date-meta { grid-template-columns: 1fr; } .article-cover :global(img) { aspect-ratio: 1.35; } .related-services { grid-template-columns: 1fr; } }
 </style>

@@ -18,6 +18,10 @@ export async function getStaticPaths() {
 
 const { category, details } = Astro.props;
 const articles = await getCollection('articles', ({ data }) => data.category === category && !data.draft);
+const draftPreviews = import.meta.env.DEV
+  ? await getCollection('articles', ({ data }) => data.category === category && data.draft)
+  : [];
+const visibleArticles = [...articles, ...draftPreviews];
 const crumbs = [
   { label: 'Home', href: '/' },
   { label: 'Kennisbank', href: '/kennisbank/' },
@@ -33,7 +37,16 @@ const structuredData = breadcrumbSchema(crumbs);
     <figure class="category-visual"><Image src={seoDashboard} alt="Laptop met een analyticsdashboard voor websiteverkeer" width={1440} height={960} format="webp" sizes="(max-width: 700px) 100vw, 46vw" loading="lazy" /><figcaption>Inzichten / {details.name}</figcaption></figure>
   </header>
   <section class="container article-list" aria-label={`Artikelen over ${details.name}`}>
-    {articles.length ? articles.map((article) => <article class="article-card">{article.data.cover && <a class="article-image" href={`/kennisbank/${category}/${article.id.split('/').at(-1)}/`} tabindex="-1" aria-hidden="true"><Image src={article.data.cover} alt="" width={article.data.cover.width} height={article.data.cover.height} format="webp" sizes="(max-width: 700px) 100vw, 50vw" loading="lazy" /></a>}<p class="eyebrow">{details.name} / Artikel</p><h2><a href={`/kennisbank/${category}/${article.id.split('/').at(-1)}/`}>{article.data.title}</a></h2><p>{article.data.description}</p><a class="article-read" href={`/kennisbank/${category}/${article.id.split('/').at(-1)}/`}>Lees artikel <ArrowUpRight size={16} aria-hidden="true" /></a></article>) : <div class="empty-state"><span class="eyebrow">Redactie / {details.name}</span><h2>De eerste artikelen worden voorbereid.</h2><p>We publiceren uitleg zodra inhoud en bronnen zijn gecontroleerd.</p><a class="hub-link" href={`/diensten/${category}/`}>Bekijk de {details.name}-dienst <ArrowUpRight size={17} aria-hidden="true" /></a></div>}
+    {visibleArticles.length ? visibleArticles.map((article) => {
+      const articleHref = `/kennisbank/${category}/${article.id.split('/').at(-1)}/`;
+      return <article class:list={['article-card', { 'is-concept': article.data.draft }]}>
+        {article.data.cover && <div class="article-image"><Image src={article.data.cover} alt={article.data.coverAlt ?? ''} width={article.data.cover.width} height={article.data.cover.height} format="webp" sizes="(max-width: 700px) 100vw, 50vw" loading="lazy" /></div>}
+        <p class="eyebrow">{article.data.draft ? 'Concept / niet gepubliceerd' : `${details.name} / Artikel`}</p>
+        <h2><a href={articleHref}>{article.data.title}</a></h2>
+        <p>{article.data.description}</p>
+        {article.data.draft ? <span class="article-read concept-status">Conceptvoorbeeld</span> : <a class="article-read" href={articleHref}>Lees artikel <ArrowUpRight size={16} aria-hidden="true" /></a>}
+      </article>;
+    }) : <div class="empty-state"><span class="eyebrow">Redactie / {details.name}</span><h2>De eerste artikelen worden voorbereid.</h2><p>We publiceren uitleg zodra inhoud en bronnen zijn gecontroleerd.</p><a class="hub-link" href={`/diensten/${category}/`}>Bekijk de {details.name}-dienst <ArrowUpRight size={17} aria-hidden="true" /></a></div>}
   </section>
 </SiteLayout>
 
@@ -54,8 +67,10 @@ const structuredData = breadcrumbSchema(crumbs);
   .article-card h2 { margin: 0.5rem 0; font-size: 1.5rem; line-height: 1.15; }
   .article-card h2 a { color: var(--ink); text-decoration: none; }
   .article-card > p:not(.eyebrow) { color: var(--muted); line-height: 1.6; }
+  .article-card.is-concept { border-top-color: var(--coral); }
   .empty-state { grid-column: 1 / -1; padding: 2rem; border-left: 4px solid var(--coral); background: var(--surface); }
   .empty-state h2 { max-width: 24ch; margin: 0.5rem 0; font-size: 1.7rem; }
   .empty-state p { color: var(--muted); line-height: 1.6; }
+  .concept-status { color: var(--muted); font-size: 0.8rem; font-weight: 400; }
   @media (max-width: 760px) { .page-hero { grid-template-columns: 1fr; gap: 1.5rem; } .article-list { grid-template-columns: 1fr; } }
 </style>
