@@ -1,0 +1,62 @@
+---
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { breadcrumbSchema } from '../../utils/structured-data';
+
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Over ons', href: '/over-ons/' }];
+const structuredData = breadcrumbSchema(crumbs);
+---
+
+<SiteLayout title="Over CF Media | SEO, GEO en webdesign" description="Lees over CF Media, onze werkwijze en de mensen achter SEO, GEO en webdesign. Teamgegevens worden aangevuld met echte profielen." canonical="https://www.cfmedia.nl/over-ons/" structuredData={structuredData}>
+  <Breadcrumbs items={crumbs} />
+  <header class="container page-hero">
+    <p class="eyebrow">Over CF Media</p>
+    <h1>Helder werk aan websites en vindbaarheid.</h1>
+    <p>CF Media is een Nederlands bureau voor SEO, GEO en webdesign. We helpen je online informatie beter vindbaar en bruikbaar te maken.</p>
+  </header>
+  <section class="container about-grid">
+    <div><p class="eyebrow">Waar we voor staan</p><h2>Inzichtelijk werk, duidelijke keuzes.</h2></div>
+    <div><p>We beginnen bij je vraag en de situatie van je website. Daarna maken we duidelijk wat we onderzoeken, wat we voorstellen en wat je zelf kunt verwachten.</p><p>Geen standaardpakket als dat niet past. Wel een plan dat aansluit op de inhoud, techniek en middelen die er zijn.</p></div>
+  </section>
+  <section class="principles">
+    <div class="container principles-inner">
+      <p class="eyebrow">Werkwijze</p>
+      <ol><li><span>01</span><h2>Luisteren</h2><p>We maken je vraag en doelen concreet.</p></li><li><span>02</span><h2>Onderzoeken</h2><p>We bekijken inhoud, techniek en gebruik.</p></li><li><span>03</span><h2>Prioriteren</h2><p>We kiezen samen wat eerst aandacht vraagt.</p></li><li><span>04</span><h2>Bespreken</h2><p>Je ziet wat is gedaan en wat nog openstaat.</p></li></ol>
+    </div>
+  </section>
+  <section class="container team-section">
+    <div><p class="eyebrow">Team</p><h2>De mensen achter het werk.</h2><p>Teamprofielen worden ingevuld zodra naam, functie, bio en foto zijn aangeleverd.</p></div>
+    <a class="team-placeholder" href="/over-ons/teamlid-invullen/"><span class="portrait-label">Foto volgt</span><span><strong>[NAAM TEAMLID INVULLEN]</strong><small>[FUNCTIE INVULLEN]</small></span><span aria-hidden="true">↗</span></a>
+  </section>
+  <section class="container company-details">
+    <p class="eyebrow">Bedrijfsgegevens</p>
+    <dl><div><dt>Bedrijfsnaam</dt><dd>CF Media</dd></div><div><dt>Adres</dt><dd>[ADRES INVULLEN]</dd></div><div><dt>KvK</dt><dd>[NUMMER INVULLEN]</dd></div><div><dt>Btw</dt><dd>[NUMMER INVULLEN]</dd></div></dl>
+  </section>
+</SiteLayout>
+
+<style>
+  .page-hero { padding-block: 4rem 5rem; }
+  h1 { max-width: 13ch; margin: 0.75rem 0; font-size: clamp(2.8rem, 6vw, 5.5rem); line-height: 1.02; }
+  .page-hero > p:last-child { max-width: 47rem; color: var(--muted); font-size: 1.2rem; line-height: 1.65; }
+  h2 { max-width: 17ch; margin: 0.5rem 0; font-size: clamp(1.7rem, 4vw, 3rem); line-height: 1.1; }
+  .about-grid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 3rem; padding-block: 3rem; border-top: 1px solid var(--line); }
+  .about-grid > div:last-child { max-width: 43rem; color: var(--muted); line-height: 1.75; }
+  .principles { padding-block: 4rem; background: var(--green-bright); }
+  .principles-inner ol { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin: 2rem 0 0; padding: 0; list-style: none; }
+  .principles li { padding-top: 1rem; border-top: 1px solid var(--green); }
+  .principles li > span { color: var(--green); font-size: 0.8rem; font-weight: 700; }
+  .principles li h2 { margin-top: 1.3rem; font-size: 1.25rem; }
+  .principles li p { color: var(--muted); line-height: 1.6; }
+  .team-section { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 3rem; padding-block: 5rem; }
+  .team-section > div p:last-child { max-width: 35rem; color: var(--muted); line-height: 1.6; }
+  .team-placeholder { display: grid; grid-template-columns: 5rem 1fr auto; align-items: center; gap: 1rem; padding-block: 1rem; border-block: 1px solid var(--line); text-decoration: none; }
+  .portrait-label { display: grid; width: 5rem; aspect-ratio: 1; place-items: center; background: var(--green-bright); color: var(--ink); font-size: 0.75rem; text-align: center; }
+  .team-placeholder strong, .team-placeholder small { display: block; }
+  .team-placeholder small { margin-top: 0.4rem; color: var(--muted); }
+  .company-details { padding-block: 3rem 5rem; border-top: 1px solid var(--line); }
+  dl { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 2rem 0 0; }
+  dt { color: var(--muted); font-size: 0.85rem; }
+  dd { margin: 0.35rem 0; font-weight: 700; overflow-wrap: anywhere; }
+  @media (max-width: 700px) { .about-grid, .team-section { grid-template-columns: 1fr; gap: 1.5rem; } .principles-inner ol { grid-template-columns: repeat(2, 1fr); } dl { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 420px) { .principles-inner ol { grid-template-columns: 1fr; } }
+</style>
