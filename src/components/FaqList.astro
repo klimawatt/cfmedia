@@ -2,10 +2,10 @@
 import type { ServiceFaq } from '../data/services';
 
 interface Props {
-  questions: ServiceFaq[];
+  questions?: ServiceFaq[];
 }
 
-const { questions } = Astro.props;
+const { questions = [] } = Astro.props;
 ---
 
 <div class="faq-list">
