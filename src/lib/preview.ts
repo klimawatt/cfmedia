@@ -1,4 +1,5 @@
 import { cleanHtml } from './html';
+import { sectionLabels, type ServiceSection } from '../data/services';
 
 type Block = Record<string, any>;
 
@@ -61,7 +62,9 @@ function faqBlock(block: Block): HTMLElement {
   return section;
 }
 
-const renderers: Record<string, (block: Block) => HTMLElement> = { steps: stepsBlock, text: textBlock, checklist: checklistBlock, callout: calloutBlock, faq: faqBlock };
+const fixedBlock = (block: Block): HTMLElement => el('div', 'pv-fixed', `Vaste sectie: ${sectionLabels[block.section as ServiceSection] ?? block.section}`);
+
+const renderers: Record<string, (block: Block) => HTMLElement> = { steps: stepsBlock, text: textBlock, checklist: checklistBlock, callout: calloutBlock, faq: faqBlock, section: fixedBlock };
 
 // Toont blokken of artikeltekst zoals ze ongeveer op de site komen.
 export function renderPreview(values: Record<string, any>): HTMLElement | null {

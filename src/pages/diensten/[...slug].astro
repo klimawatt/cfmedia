@@ -6,7 +6,7 @@ import FaqList from '../../components/FaqList.astro';
 import ServiceContentBlocks from '../../components/ServiceContentBlocks.astro';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import seoDashboard from '../../assets/seo-dashboard.jpg';
-import { applyServiceOverrides, services, type ServiceHub, type ServicePage } from '../../data/services';
+import { applyServiceOverrides, resolveLayout, services, type ServiceHub, type ServicePage } from '../../data/services';
 import { getOverrideMap, seoProps } from '../../lib/cms';
 import { breadcrumbSchema, faqSchema } from '../../utils/structured-data';
 
@@ -18,6 +18,7 @@ export async function getStaticPaths() {
 const service = Astro.props.service as ServicePage | ServiceHub;
 const isHub = (item: ServicePage | ServiceHub): item is ServiceHub => 'subservices' in item;
 const isServiceHub = isHub(service);
+const layout = resolveLayout(service.contentBlocks, isServiceHub);
 const entryService = isServiceHub && ['seo', 'geo'].includes(service.slug) ? service.subservices[0] : undefined;
 const hub = services.find((item) => item.slug === service.hub)!;
 const crumbs = [
@@ -60,43 +61,38 @@ const seo = seoProps(service.seo, { title: service.title, description: service.d
     <a class="text-link" href={`/diensten/${entryService.slug}/`}>Bekijk de audit <span aria-hidden="true">↗</span></a>
   </section>}
 
-  {isServiceHub ? (
-    <>
+  {layout.map((item, index) => item.type !== 'section' ? <ServiceContentBlocks blocks={[item]} startIndex={index} /> : item.section === 'intro' ? (
+    isServiceHub ? (
       <section class="container intro-grid">
         <div><h2>Wat is {service.name}?</h2><p>{service.approach}</p></div>
         <div><h2>Voor wie?</h2><p>{service.audience}</p></div>
       </section>
-      <section class="container deliverables">
-        <div><p class="eyebrow">Wat je krijgt</p><h2>Werk dat je verder helpt</h2></div>
-        <ul>{service.deliverables.map((item) => <li>{item}</li>)}</ul>
-      </section>
-      <ServiceContentBlocks blocks={service.contentBlocks} />
-      <section id="dienstaanbod" class="container subservices">
-        <p class="eyebrow">{service.name}</p><h2>Waar wil je mee beginnen?</h2>
-        <div class="subservice-grid">
-          {service.subservices.map((item) => <article><h3><a href={`/diensten/${item.slug}/`}>{item.name}</a></h3><p>{item.summary}</p><a class="text-link" href={`/diensten/${item.slug}/`}>Meer over {item.name} <span aria-hidden="true">↗</span></a></article>)}
-        </div>
-      </section>
-      <section class="container knowledge-link">
-        <div><p class="eyebrow">Verder lezen</p><h2>Inzichten over {service.name}</h2><p>Bekijk de kennisbankcategorie voor artikelen. Concepten worden pas gepubliceerd na redactie.</p></div>
-        <a class="text-link" href={`/kennisbank/${service.category}/`}>Naar de {service.name}-kennisbank <span aria-hidden="true">↗</span></a>
-      </section>
-      <section class="container faq-section"><p class="eyebrow">Veelgestelde vragen</p><h2>Vragen over {service.name}</h2><FaqList questions={service.faq} /></section>
-    </>
-  ) : (
-    <>
+    ) : (
       <section class="container detail-grid">
         <div><p class="eyebrow">Het probleem</p><h2>Waar je tegenaan loopt</h2><p>{service.problem}</p></div>
         <div><p class="eyebrow">De aanpak</p><h2>Wat we doen</h2><p>{service.approach}</p></div>
       </section>
-      <section class="container deliverables">
-        <div><p class="eyebrow">Wat je krijgt</p><h2>Concreet en inzichtelijk</h2></div>
-        <ul>{service.deliverables.map((item) => <li>{item}</li>)}</ul>
-      </section>
-      {service.contentBlocks && service.contentBlocks.length > 0 && <ServiceContentBlocks blocks={service.contentBlocks} />}
-      <section class="container faq-section"><p class="eyebrow">Veelgestelde vragen</p><h2>Over {service.name.toLowerCase()}</h2><FaqList questions={service.faq} /></section>
-    </>
-  )}
+    )
+  ) : item.section === 'deliverables' ? (
+    <section class="container deliverables">
+      <div><p class="eyebrow">Wat je krijgt</p><h2>{isServiceHub ? 'Werk dat je verder helpt' : 'Concreet en inzichtelijk'}</h2></div>
+      <ul>{service.deliverables.map((entry) => <li>{entry}</li>)}</ul>
+    </section>
+  ) : item.section === 'subservices' && isServiceHub ? (
+    <section id="dienstaanbod" class="container subservices">
+      <p class="eyebrow">{service.name}</p><h2>Waar wil je mee beginnen?</h2>
+      <div class="subservice-grid">
+        {service.subservices.map((sub) => <article><h3><a href={`/diensten/${sub.slug}/`}>{sub.name}</a></h3><p>{sub.summary}</p><a class="text-link" href={`/diensten/${sub.slug}/`}>Meer over {sub.name} <span aria-hidden="true">↗</span></a></article>)}
+      </div>
+    </section>
+  ) : item.section === 'knowledge' && isServiceHub ? (
+    <section class="container knowledge-link">
+      <div><p class="eyebrow">Verder lezen</p><h2>Inzichten over {service.name}</h2><p>Bekijk de kennisbankcategorie voor artikelen. Concepten worden pas gepubliceerd na redactie.</p></div>
+      <a class="text-link" href={`/kennisbank/${service.category}/`}>Naar de {service.name}-kennisbank <span aria-hidden="true">↗</span></a>
+    </section>
+  ) : item.section === 'faq' ? (
+    <section class="container faq-section"><p class="eyebrow">Veelgestelde vragen</p><h2>{isServiceHub ? `Vragen over ${service.name}` : `Over ${service.name.toLowerCase()}`}</h2><FaqList questions={service.faq} /></section>
+  ) : null)}
 
   <section class="container service-cta"><p class="eyebrow">Een vraag over {service.name}?</p><h2>Leg je situatie aan ons voor.</h2><a class="button-primary" href="/contact/">Plan een gesprek <span aria-hidden="true">↗</span></a></section>
 </SiteLayout>

@@ -1,17 +1,19 @@
 ---
-import type { ServiceContentBlock } from '../data/services';
+import type { CustomBlock } from '../data/services';
 import { cleanHtml } from '../lib/html';
 import FaqList from './FaqList.astro';
 
 interface Props {
-  blocks: ServiceContentBlock[];
+  blocks: CustomBlock[];
+  startIndex?: number;
 }
 
-const { blocks } = Astro.props;
+const { blocks, startIndex = 0 } = Astro.props;
+const indexed = blocks.map((block, index) => ({ block, blockIndex: index + startIndex }));
 ---
 
 <div class="content-blocks">
-  {blocks.map((block, blockIndex) => block.type === 'steps' ? (
+  {indexed.map(({ block, blockIndex }) => block.type === 'steps' ? (
     <section class="step-section" aria-labelledby={`service-block-${blockIndex}`}>
       <div class="container step-layout">
         <header class="step-heading">
@@ -20,14 +22,14 @@ const { blocks } = Astro.props;
           <p>{block.intro}</p>
         </header>
         <ol class="step-list">
-          {block.steps.map((step, index) => (
+          {(block.steps ?? []).map((step, index) => (
             <li class="step-item">
               <span class="step-marker" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
               <article class="step-content">
                 <p class="step-phase">{step.phase}</p>
                 <h3>{step.title}</h3>
                 <p class="step-description">{step.description}</p>
-                {step.tags.length > 0 && <ul class="step-tags" aria-label="Onderwerpen">{step.tags.map((tag) => <li>{tag}</li>)}</ul>}
+                {(step.tags ?? []).length > 0 && <ul class="step-tags" aria-label="Onderwerpen">{(step.tags ?? []).map((tag) => <li>{tag}</li>)}</ul>}
               </article>
             </li>
           ))}
@@ -45,7 +47,7 @@ const { blocks } = Astro.props;
     <section class="text-section" aria-labelledby={`service-block-${blockIndex}`}>
       <div class="container text-layout">
         <p class="eyebrow">{block.eyebrow}</p>
-        <div><h2 id={`service-block-${blockIndex}`}>{block.title}</h2><ul class="check-list">{block.items.map((item) => <li>{item}</li>)}</ul></div>
+        <div><h2 id={`service-block-${blockIndex}`}>{block.title}</h2><ul class="check-list">{(block.items ?? []).map((item) => <li>{item}</li>)}</ul></div>
       </div>
     </section>
   ) : block.type === 'callout' ? (
@@ -59,7 +61,7 @@ const { blocks } = Astro.props;
     <section class="text-section" aria-labelledby={`service-block-${blockIndex}`}>
       <div class="container text-layout">
         <p class="eyebrow">{block.eyebrow}</p>
-        <div><h2 id={`service-block-${blockIndex}`}>{block.title}</h2><FaqList questions={block.questions} /></div>
+        <div><h2 id={`service-block-${blockIndex}`}>{block.title}</h2><FaqList questions={block.questions ?? []} /></div>
       </div>
     </section>
   ))}

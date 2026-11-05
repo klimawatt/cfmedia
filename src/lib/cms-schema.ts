@@ -1,4 +1,4 @@
-import { allServicePages, services, serviceKey } from '../data/services';
+import { allServicePages, resolveLayout, services, serviceKey } from '../data/services';
 import { pageDefaults, pageLabels, type PageSlug } from '../data/pages';
 
 export interface Option { value: string; label: string }
@@ -84,7 +84,7 @@ const serviceFields: Field[] = [
   ta('audience', 'Voor wie (alleen op hoofdpagina’s)', 3),
   lines('deliverables', 'Wat je krijgt'),
   { key: 'faq', label: 'Veelgestelde vragen', type: 'repeater', itemLabel: 'Vraag', fields: [t('question', 'Vraag'), ta('answer', 'Antwoord', 3)] },
-  { key: 'contentBlocks', label: 'Extra blokken (stappenplannen en tekst)', type: 'repeater', itemLabel: 'Blok', addTypes: blockTypes, fields: blockFields, help: 'Kies met de knoppen onderaan welk blok je wilt toevoegen. Blokken staan onder “Wat je krijgt”.' },
+  { key: 'contentBlocks', label: 'Extra blokken (stappenplannen en tekst)', type: 'repeater', itemLabel: 'Blok', addTypes: blockTypes, fields: blockFields, help: 'Dit is de volledige indeling van de pagina. Voeg met de knoppen onderaan een blok toe en verplaats alles met Omhoog en Omlaag, ook de vaste secties.' },
 ];
 
 const homeFields: Field[] = [
@@ -187,8 +187,10 @@ const toParagraphs = (items: string[]) => items.map((item) => item.trim()).filte
 // Zet oudere platte tekst om naar HTML, zodat de editor het kan tonen.
 export function prepareValues(collection: string, slug: string, values: Record<string, any>): Record<string, any> {
   const next = { ...values };
-  if (collection === 'service' && Array.isArray(next.contentBlocks)) {
-    next.contentBlocks = next.contentBlocks.map((block: any) => (block.type === 'text' && !block.html && Array.isArray(block.paragraphs) ? { ...block, html: toParagraphs(block.paragraphs) } : block));
+  if (collection === 'service') {
+    const blocks = Array.isArray(next.contentBlocks) ? next.contentBlocks : [];
+    const withHtml = blocks.map((block: any) => (block.type === 'text' && !block.html && Array.isArray(block.paragraphs) ? { ...block, html: toParagraphs(block.paragraphs) } : block));
+    next.contentBlocks = resolveLayout(withHtml, services.some((hub) => hub.slug === slug));
   }
   if (collection === 'page' && slug === 'over-mij' && typeof next.story === 'string' && next.story && !/^\s*</.test(next.story)) {
     next.story = toParagraphs(next.story.split(/\n\s*\n/));

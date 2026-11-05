@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { collections, prepareValues, seoFields, SERVICE_TAGS, type CollectionDef, type Field, type FixedItem } from './cms-schema';
 import { createRichText, type RichText } from './rte';
 import { renderPreview } from './preview';
+import { sectionLabels, type ServiceSection } from '../data/services';
 
 interface Row { id: string; collection: string; slug: string; title: string; data: Record<string, any>; status: 'draft' | 'published'; version: number; published_at: string | null }
 interface Current { row?: Row; item?: FixedItem; slug: string; title: string }
@@ -112,21 +113,36 @@ function buildRepeater(field: Field, wrap: HTMLElement, value: unknown): HTMLEle
   return wrap;
 }
 
-function buildItem(field: Field, values: Record<string, any>, list: HTMLElement): HTMLElement {
-  const item = make('fieldset', { class: 'repeater-item' });
-  item.append(make('legend'));
+function itemBar(field: Field, item: HTMLElement, list: HTMLElement, removable: boolean, name: string): HTMLElement {
   const bar = make('div', { class: 'item-bar' });
   const actions: Array<[string, () => void]> = [
     ['Omhoog', () => { const previous = item.previousElementSibling; if (previous) list.insertBefore(item, previous); }],
     ['Omlaag', () => { const next = item.nextElementSibling; if (next) list.insertBefore(next, item); }],
-    ['Verwijderen', () => item.remove()],
   ];
+  if (removable) actions.push(['Verwijderen', () => item.remove()]);
   for (const [label, run] of actions) {
-    const button = make('button', { type: 'button', class: 'redactie-button small', 'aria-label': `${label}: ${field.itemLabel ?? 'item'}` }, label);
+    const button = make('button', { type: 'button', class: 'redactie-button small', 'aria-label': `${label}: ${name}` }, label === 'Omhoog' ? '↑ Omhoog' : label === 'Omlaag' ? '↓ Omlaag' : label);
     button.addEventListener('click', () => { run(); renumber(field, list); refreshSeo(); });
     bar.append(button);
   }
-  item.append(bar);
+  return bar;
+}
+
+function buildFixedItem(field: Field, values: Record<string, any>, list: HTMLElement): HTMLElement {
+  const label = sectionLabels[values.section as ServiceSection] ?? String(values.section);
+  const item = make('fieldset', { class: 'repeater-item is-fixed' });
+  item.dataset.fixed = JSON.stringify(values);
+  item.append(make('legend', {}, `Vaste sectie: ${label}`));
+  item.append(make('p', { class: 'help' }, 'Deze sectie bewerk je met de velden hierboven. Hier bepaal je alleen waar hij op de pagina staat.'));
+  item.append(itemBar(field, item, list, false, label));
+  return item;
+}
+
+function buildItem(field: Field, values: Record<string, any>, list: HTMLElement): HTMLElement {
+  if (values.type === 'section') return buildFixedItem(field, values, list);
+  const item = make('fieldset', { class: 'repeater-item' });
+  item.append(make('legend'));
+  item.append(itemBar(field, item, list, true, field.itemLabel ?? 'item'));
   const holder = make('div', { class: 'item-fields' });
   buildFields(field.fields ?? [], values, holder);
   item.append(holder);
@@ -134,7 +150,8 @@ function buildItem(field: Field, values: Record<string, any>, list: HTMLElement)
 }
 
 function renumber(field: Field, list: HTMLElement) {
-  list.querySelectorAll(':scope > .repeater-item > legend').forEach((legend, index) => {
+  list.querySelectorAll<HTMLElement>(':scope > .repeater-item > legend').forEach((legend, index) => {
+    if (legend.parentElement?.dataset.fixed) return;
     const kind = legend.parentElement?.querySelector<HTMLSelectElement>(':scope > .item-fields > [data-key="type"] > .ctl')?.selectedOptions[0]?.text;
     legend.textContent = `${kind ?? field.itemLabel ?? 'Item'} ${index + 1}`;
   });
@@ -160,7 +177,7 @@ function readField(field: Field, wrap: HTMLElement): any {
   if (field.type === 'richtext') return richTexts.get(wrap)?.getHtml() ?? '';
   if (field.type === 'repeater') {
     return [...wrap.querySelectorAll<HTMLElement>(':scope > .repeater-items > .repeater-item')]
-      .map((item) => readFields(field.fields ?? [], item.querySelector<HTMLElement>(':scope > .item-fields')!));
+      .map((item) => (item.dataset.fixed ? JSON.parse(item.dataset.fixed) : readFields(field.fields ?? [], item.querySelector<HTMLElement>(':scope > .item-fields')!)));
   }
   const control = wrap.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(':scope > .ctl')!;
   const value = control.value.trim();

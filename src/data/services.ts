@@ -51,7 +51,40 @@ export interface ServiceFaqBlock {
   questions: ServiceFaq[];
 }
 
-export type ServiceContentBlock = ServiceStepsBlock | ServiceTextBlock | ServiceChecklistBlock | ServiceCalloutBlock | ServiceFaqBlock;
+export type ServiceSection = 'intro' | 'deliverables' | 'subservices' | 'knowledge' | 'faq';
+
+export interface ServiceSectionMarker {
+  type: 'section';
+  section: ServiceSection;
+}
+
+export type CustomBlock = ServiceStepsBlock | ServiceTextBlock | ServiceChecklistBlock | ServiceCalloutBlock | ServiceFaqBlock;
+export type ServiceContentBlock = CustomBlock | ServiceSectionMarker;
+
+export const sectionLabels: Record<ServiceSection, string> = {
+  intro: 'Introductie (uitleg of probleem en aanpak)',
+  deliverables: 'Wat je krijgt',
+  subservices: 'Subdiensten',
+  knowledge: 'Verder lezen (kennisbank)',
+  faq: 'Veelgestelde vragen',
+};
+
+const hubSections: ServiceSection[] = ['intro', 'deliverables', 'subservices', 'knowledge', 'faq'];
+const subSections: ServiceSection[] = ['intro', 'deliverables', 'faq'];
+const marker = (section: ServiceSection): ServiceSectionMarker => ({ type: 'section', section });
+
+// Volgorde van de pagina: vaste secties en eigen blokken door elkaar. Zonder markeringen blijft de standaardvolgorde.
+export function resolveLayout(blocks: ServiceContentBlock[] | undefined, isHub: boolean): ServiceContentBlock[] {
+  const list = blocks ?? [];
+  const core = isHub ? hubSections : subSections;
+  if (!list.some((block) => block.type === 'section')) {
+    const split = core.indexOf('deliverables') + 1;
+    return [...core.slice(0, split).map(marker), ...list, ...core.slice(split).map(marker)];
+  }
+  const valid = list.filter((block) => block.type !== 'section' || core.includes(block.section));
+  const present = new Set(valid.flatMap((block) => (block.type === 'section' ? [block.section] : [])));
+  return [...valid, ...core.filter((section) => !present.has(section)).map(marker)];
+}
 
 export interface ServicePage {
   slug: string;
