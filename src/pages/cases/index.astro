@@ -1,0 +1,77 @@
+---
+import { getCollection } from 'astro:content';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { breadcrumbSchema } from '../../utils/structured-data';
+
+const cases = await getCollection('cases');
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Cases', href: '/cases/' }];
+const structuredData = breadcrumbSchema(crumbs);
+---
+
+<SiteLayout title="Cases | CF Media" description="Bekijk hoe CF Media werkt aan SEO, GEO en webdesign. Case-inhoud wordt pas gepubliceerd na controle en toestemming." canonical="https://www.cfmedia.nl/cases/" structuredData={structuredData}>
+  <Breadcrumbs items={crumbs} />
+  <header class="container page-hero">
+    <p class="eyebrow">Werk in de praktijk</p>
+    <h1>Cases</h1>
+    <p>Hier delen we de vraag, aanpak en uitkomst van afgeronde projecten. Klantnamen en resultaten verschijnen alleen met toestemming.</p>
+  </header>
+  <section class="container case-section" aria-labelledby="case-list-heading">
+    <div class="filter-row">
+      <h2 id="case-list-heading">Projecten</h2>
+      <label for="service-filter">Filter op dienst</label>
+      <select id="service-filter" aria-controls="case-list">
+        <option value="all">Alle diensten</option>
+        <option value="seo">SEO</option>
+        <option value="geo">GEO</option>
+        <option value="webdesign">Webdesign</option>
+      </select>
+    </div>
+    <div id="case-list" class="case-list">
+      {cases.map((item) => (
+        <article class="case-item" data-services={item.data.serviceTags.join(' ')}>
+          <p class="eyebrow">{item.data.serviceTags.length ? item.data.serviceTags.join(' · ') : 'Case toevoegen'}</p>
+          <h3><a href={`/cases/${item.id.split('/').at(-1)}/`}>{item.data.title}</a></h3>
+          <p>{item.data.description}</p>
+          <a class="text-link" href={`/cases/${item.id.split('/').at(-1)}/`}>Bekijk de case-opzet <span aria-hidden="true">↗</span></a>
+        </article>
+      ))}
+    </div>
+    <p id="filter-status" class="visually-hidden" aria-live="polite"></p>
+  </section>
+</SiteLayout>
+
+<script>
+  const filter = document.querySelector<HTMLSelectElement>('#service-filter');
+  const casesList = document.querySelectorAll<HTMLElement>('.case-item');
+  const status = document.querySelector<HTMLElement>('#filter-status');
+
+  filter?.addEventListener('change', () => {
+    let visibleCount = 0;
+    casesList.forEach((item) => {
+      const tags = item.dataset.services?.split(' ') ?? [];
+      const visible = filter.value === 'all' || tags.includes(filter.value);
+      item.hidden = !visible;
+      if (visible) visibleCount += 1;
+    });
+    if (status) status.textContent = `${visibleCount} ${visibleCount === 1 ? 'case' : 'cases'} zichtbaar`;
+  });
+</script>
+
+<style>
+  .page-hero { padding-block: 4rem 3rem; }
+  h1 { margin: 0.75rem 0; font-size: clamp(3rem, 7vw, 6rem); line-height: 1; }
+  .page-hero > p:last-child { max-width: 46rem; color: var(--muted); font-size: 1.15rem; line-height: 1.65; }
+  .case-section { padding-block: 2rem 6rem; }
+  .filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; padding-block: 1rem; border-top: 1px solid var(--line); }
+  .filter-row h2 { margin: 0 auto 0 0; font-size: 1.4rem; }
+  select { min-height: 2.75rem; min-width: 10rem; padding: 0.5rem 2rem 0.5rem 0.7rem; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+  .case-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; padding-top: 1rem; }
+  .case-item { min-width: 0; padding: 1.5rem; border-top: 2px solid var(--green); background: var(--surface); }
+  .case-item h3 { margin: 0.6rem 0; font-size: 1.5rem; overflow-wrap: anywhere; }
+  .case-item h3 a { text-decoration: none; }
+  .case-item > p:not(.eyebrow) { color: var(--muted); line-height: 1.6; }
+  .text-link { color: var(--green); font-weight: 700; text-underline-offset: 0.2em; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+  @media (max-width: 600px) { .case-list { grid-template-columns: 1fr; } }
+</style>
