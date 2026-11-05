@@ -1,0 +1,67 @@
+---
+import type { ServiceContentBlock } from '../data/services';
+
+interface Props {
+  blocks: ServiceContentBlock[];
+}
+
+const { blocks } = Astro.props;
+---
+
+<div class="content-blocks">
+  {blocks.map((block, blockIndex) => block.type === 'steps' ? (
+    <section class="step-section" aria-labelledby={`service-block-${blockIndex}`}>
+      <div class="container step-layout">
+        <header class="step-heading">
+          <p class="eyebrow">{block.eyebrow}</p>
+          <h2 id={`service-block-${blockIndex}`}>{block.title}</h2>
+          <p>{block.intro}</p>
+        </header>
+        <ol class="step-list">
+          {block.steps.map((step, index) => (
+            <li class="step-item">
+              <span class="step-marker" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              <article class="step-content">
+                <p class="step-phase">{step.phase}</p>
+                <h3>{step.title}</h3>
+                <p class="step-description">{step.description}</p>
+                {step.tags.length > 0 && <ul class="step-tags" aria-label="Onderwerpen">{step.tags.map((tag) => <li>{tag}</li>)}</ul>}
+              </article>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  ) : (
+    <section class="text-section" aria-labelledby={`service-block-${blockIndex}`}>
+      <div class="container text-layout">
+        <p class="eyebrow">{block.eyebrow}</p>
+        <div><h2 id={`service-block-${blockIndex}`}>{block.title}</h2>{block.paragraphs.map((paragraph) => <p>{paragraph}</p>)}</div>
+      </div>
+    </section>
+  ))}
+</div>
+
+<style>
+  .step-section { padding-block: 4.5rem; border-top: 1px solid var(--line); }
+  .step-layout { display: grid; grid-template-columns: minmax(13rem, 0.7fr) minmax(0, 1.3fr); gap: clamp(2rem, 6vw, 5rem); }
+  .step-heading { align-self: start; }
+  .step-heading h2, .text-layout h2 { max-width: 13ch; margin: 0.5rem 0 0.8rem; font-size: var(--type-h2); line-height: 1.05; }
+  .step-heading > p:last-child, .text-layout div > p { max-width: 38rem; color: var(--muted); line-height: 1.7; }
+  .step-list { position: relative; display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+  .step-list::before { position: absolute; top: 1.6rem; bottom: 1.6rem; left: 1.45rem; width: 1px; background: var(--line); content: ''; }
+  .step-item { position: relative; display: grid; grid-template-columns: 3rem minmax(0, 1fr); align-items: start; gap: 1.15rem; }
+  .step-marker { position: relative; z-index: 1; display: grid; width: 3rem; height: 3rem; place-items: center; border: 1px solid var(--accent); background: var(--paper); color: var(--accent); font-family: 'Space Grotesk Variable', sans-serif; font-size: 0.95rem; font-weight: 700; }
+  .step-content { min-width: 0; padding: 0.1rem 0 1.8rem; border-bottom: 1px solid var(--line); }
+  .step-item + .step-item .step-content { padding-top: 1.2rem; }
+  .step-phase { margin: 0; color: var(--accent); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+  .step-content h3 { margin: 0.35rem 0 0.45rem; font-size: 1.35rem; }
+  .step-description { max-width: 48rem; margin: 0; color: var(--muted); line-height: 1.65; }
+  .step-tags { display: flex; flex-wrap: wrap; gap: 0.35rem 0.8rem; margin: 0.85rem 0 0; padding: 0; list-style: none; color: var(--muted); font-size: 0.72rem; }
+  .step-tags li + li::before { margin-right: 0.8rem; color: var(--accent); content: '/'; }
+  .text-section { padding-block: 3rem; background: var(--surface-soft); }
+  .text-layout { display: grid; grid-template-columns: minmax(13rem, 0.7fr) minmax(0, 1.3fr); gap: clamp(2rem, 6vw, 5rem); }
+  .text-layout h2 { margin-top: 0; }
+  .text-layout div > p { margin-block: 0 0.8rem; }
+  @media (max-width: 720px) { .step-layout, .text-layout { grid-template-columns: 1fr; gap: 1.5rem; } .step-heading h2, .text-layout h2 { font-size: var(--type-h2-medium); } }
+</style>

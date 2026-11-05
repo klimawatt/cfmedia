@@ -3,6 +3,7 @@ import { ArrowUpRight } from '@lucide/astro';
 import { Image } from 'astro:assets';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import FaqList from '../../components/FaqList.astro';
+import ServiceContentBlocks from '../../components/ServiceContentBlocks.astro';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import seoDashboard from '../../assets/seo-dashboard.jpg';
 import { allServicePages, services, type ServiceHub, type ServicePage } from '../../data/services';
@@ -59,10 +60,7 @@ const structuredData = [breadcrumbSchema(crumbs), serviceSchema, ...(isServiceHu
         <div><p class="eyebrow">Wat je krijgt</p><h2>Werk dat je verder helpt</h2></div>
         <ul>{service.deliverables.map((item) => <li>{item}</li>)}</ul>
       </section>
-      <section class="container process">
-        <p class="eyebrow">Werkwijze</p><h2>Een helder traject</h2>
-        <ol>{service.process.map((step) => <li>{step}</li>)}</ol>
-      </section>
+      <ServiceContentBlocks blocks={service.contentBlocks} />
       <section id="dienstaanbod" class="container subservices">
         <p class="eyebrow">{service.name}</p><h2>Waar wil je mee beginnen?</h2>
         <div class="subservice-grid">
@@ -101,12 +99,11 @@ const structuredData = [breadcrumbSchema(crumbs), serviceSchema, ...(isServiceHu
   .seo-visual { background: var(--green-bright); }
   .seo-visual :global(img) { display: block; width: 100%; aspect-ratio: 1.35; object-fit: cover; }
   .seo-visual figcaption { padding: 0.8rem 1rem; font-size: 0.78rem; font-weight: 700; }
-  .service-index { display: flex; flex-direction: column; justify-content: space-between; padding: 1.4rem; background: #dcecff; color: #17231d; }
-  .service-index.geo { background: #c8ec7c; }
-  .service-index.webdesign { background: #ffddd3; }
+  .service-index { display: flex; flex-direction: column; justify-content: space-between; padding: 1.4rem; border-top: 3px solid var(--accent); background: var(--surface-soft); color: var(--ink); }
+  .service-index.geo, .service-index.webdesign { background: var(--surface-soft); }
   .service-index .eyebrow { margin-top: 0; color: inherit; }
   .service-index ul { margin: 1rem 0 0; padding: 0; list-style: none; }
-  .service-index li { display: grid; grid-template-columns: 2rem 1fr; gap: 0.5rem; padding-block: 0.75rem; border-top: 1px solid #17231d35; }
+  .service-index li { display: grid; grid-template-columns: 2rem 1fr; gap: 0.5rem; padding-block: 0.75rem; border-top: 1px solid var(--line); }
   .service-index li > span { font-size: 0.75rem; font-weight: 700; }
   .service-index li a { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; color: inherit; font-weight: 700; text-decoration: none; }
   .index-signature { align-self: flex-end; margin-top: 1.25rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; }
@@ -119,10 +116,7 @@ const structuredData = [breadcrumbSchema(crumbs), serviceSchema, ...(isServiceHu
   .deliverables ul { margin: 0; padding: 0; list-style: none; }
   .deliverables li { padding: 0.8rem 0; border-bottom: 1px solid var(--line); }
   .deliverables li::before { content: '↗'; margin-right: 0.75rem; color: var(--green); }
-  .process, .subservices, .faq-section { padding-block: 4rem; border-top: 1px solid var(--line); }
-  .process ol { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 2rem 0 0; padding: 0; list-style: none; counter-reset: steps; }
-  .process li { min-height: 8rem; padding: 1rem; border-top: 2px solid var(--green); background: var(--surface); counter-increment: steps; line-height: 1.5; }
-  .process li::before { content: '0' counter(steps); display: block; margin-bottom: 1.2rem; color: var(--green); font-size: 0.8rem; font-weight: 700; }
+  .subservices, .faq-section { padding-block: 4rem; border-top: 1px solid var(--line); }
   .subservice-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2rem; }
   .subservice-grid article { padding-top: 1rem; border-top: 1px solid var(--line); }
   .subservice-grid h3 { margin: 0; font-size: 1.25rem; }
@@ -134,6 +128,5 @@ const structuredData = [breadcrumbSchema(crumbs), serviceSchema, ...(isServiceHu
   .faq-section h2 { margin-bottom: 2rem; }
   .service-cta { margin-block: 2rem 5rem; padding: clamp(1.5rem, 5vw, 4rem); background: var(--green-bright); }
   .service-cta h2 { max-width: 16ch; margin: 0 0 1.5rem; font-size: var(--type-h2); }
-  @media (max-width: 700px) { .hub-hero { grid-template-columns: 1fr; gap: 1.5rem; } .service-visual { min-height: 0; } .intro-grid, .detail-grid, .deliverables { grid-template-columns: 1fr; gap: 1.2rem; } .process ol { grid-template-columns: repeat(2, 1fr); } .subservice-grid { grid-template-columns: 1fr; } .knowledge-link { align-items: flex-start; flex-direction: column; } }
-  @media (max-width: 420px) { .process ol { grid-template-columns: 1fr; } }
+  @media (max-width: 700px) { .hub-hero { grid-template-columns: 1fr; gap: 1.5rem; } .service-visual { min-height: 0; } .intro-grid, .detail-grid, .deliverables { grid-template-columns: 1fr; gap: 1.2rem; } .subservice-grid { grid-template-columns: 1fr; } .knowledge-link { align-items: flex-start; flex-direction: column; } }
 </style>

@@ -3,6 +3,30 @@ export interface ServiceFaq {
   answer: string;
 }
 
+export interface ServicePlanStep {
+  phase: string;
+  title: string;
+  description: string;
+  tags: string[];
+}
+
+export interface ServiceStepsBlock {
+  type: 'steps';
+  eyebrow: string;
+  title: string;
+  intro: string;
+  steps: ServicePlanStep[];
+}
+
+export interface ServiceTextBlock {
+  type: 'text';
+  eyebrow: string;
+  title: string;
+  paragraphs: string[];
+}
+
+export type ServiceContentBlock = ServiceStepsBlock | ServiceTextBlock;
+
 export interface ServicePage {
   slug: string;
   name: string;
@@ -18,7 +42,7 @@ export interface ServicePage {
 
 export interface ServiceHub extends ServicePage {
   audience: string;
-  process: string[];
+  contentBlocks: ServiceContentBlock[];
   subservices: ServicePage[];
   category: string;
 }
@@ -85,7 +109,22 @@ export const services: ServiceHub[] = [
     approach: 'We bekijken techniek, inhoud en structuur in samenhang. Daarna prioriteren we verbeteringen die passen bij je doelen.',
     deliverables: ['inzicht in je huidige vindbaarheid', 'geprioriteerd advies', 'ondersteuning bij uitvoering'],
     hub: 'seo', audience: 'SEO is relevant als je website structureel bezoekers uit zoekmachines moet aantrekken en je bereid bent te investeren in techniek en inhoud.',
-    process: ['We bespreken je doelen en huidige situatie.', 'We onderzoeken techniek, content en zoekvragen.', 'We maken een plan met heldere prioriteiten.', 'We voeren verbeteringen uit en bespreken de voortgang.'],
+    contentBlocks: [
+      {
+        type: 'steps', eyebrow: 'Van vraag naar plan', title: 'Zo pakken we SEO aan',
+        intro: 'We beginnen met inzicht in je huidige situatie en werken toe naar verbeteringen die je team kan uitvoeren en volgen.',
+        steps: [
+          { phase: 'Fase 1', title: 'Doelen en uitgangspunt', description: 'We bespreken je doelen, doelgroep en huidige website. Samen bepalen we wat een goede nulmeting voor jouw situatie bevat.', tags: ['Doelen', 'Nulmeting', 'Zoekvragen'] },
+          { phase: 'Fase 2', title: 'Onderzoek en prioriteiten', description: 'We onderzoeken techniek, inhoud en interne structuur. De bevindingen ordenen we op relevantie en benodigde inspanning.', tags: ['Techniek', 'Content', 'Structuur'] },
+          { phase: 'Fase 3', title: 'Verbeterplan', description: 'Je krijgt een concreet plan met aanbevelingen, volgorde en uitleg voor de mensen die het werk uitvoeren.', tags: ['Aanbevelingen', 'Planning'] },
+          { phase: 'Fase 4', title: 'Uitvoeren en bijsturen', description: 'We ondersteunen bij de uitvoering en bespreken wat er is aangepast en wat daarna aandacht verdient.', tags: ['Uitvoering', 'Evaluatie'] },
+        ],
+      },
+      {
+        type: 'text', eyebrow: 'Samenwerken', title: 'Inzicht vóór extra werk',
+        paragraphs: ['Je weet vooraf waar we naar kijken en waarom iets prioriteit krijgt.', 'We stemmen de omvang van het werk af op je doelen, website en beschikbare middelen.'],
+      },
+    ],
     subservices: seoSubservices, category: 'seo', faq: hubFaq('SEO'),
   },
   {
@@ -96,7 +135,18 @@ export const services: ServiceHub[] = [
     approach: 'We maken je openbare informatie duidelijk, controleerbaar en goed gestructureerd. GEO bouwt voort op een sterke inhoudelijke en technische basis.',
     deliverables: ['inzicht in je AI-vindbaarheid', 'advies voor betrouwbare informatie', 'prioriteiten voor je website'],
     hub: 'geo', audience: 'GEO past bij organisaties die hun informatie ook in nieuwe AI-zoekervaringen helder beschikbaar willen maken.',
-    process: ['We bepalen welke vragen en AI-zoekervaringen relevant zijn.', 'We onderzoeken je website en openbare bronnen.', 'We prioriteren inhoudelijke en technische verbeteringen.', 'We evalueren de voortgang en passen het plan aan.'],
+    contentBlocks: [
+      {
+        type: 'steps', eyebrow: 'Onderzoek / verbeteren / evalueren', title: 'Een zorgvuldige GEO-aanpak',
+        intro: 'GEO begint met vragen die voor je organisatie relevant zijn. We maken informatie controleerbaar voordat we verbeteringen voorstellen.',
+        steps: [
+          { phase: 'Fase 1', title: 'Kies relevante vragen', description: 'We bepalen welke onderwerpen en AI-zoekervaringen passen bij je doelgroep en diensten.', tags: ['Doelgroep', 'Vragen', 'Onderwerpen'] },
+          { phase: 'Fase 2', title: 'Bekijk bronnen en antwoorden', description: 'We onderzoeken je website en relevante openbare bronnen. Antwoorden behandelen we als momentopname, niet als vaste belofte.', tags: ['Bronnen', 'Nulmeting'] },
+          { phase: 'Fase 3', title: 'Maak informatie duidelijker', description: 'We verbeteren waar nodig de structuur, onderbouwing en samenhang van je openbare informatie.', tags: ['Inhoud', 'Bronvermelding', 'Structuur'] },
+          { phase: 'Fase 4', title: 'Evalueer en stel bij', description: 'We bekijken opnieuw hoe je belangrijkste informatie wordt gevonden en bepalen welke vervolgstap passend is.', tags: ['Evaluatie', 'Vervolg'] },
+        ],
+      },
+    ],
     subservices: geoSubservices, category: 'geo', faq: hubFaq('GEO'),
   },
   {
@@ -107,7 +157,18 @@ export const services: ServiceHub[] = [
     approach: 'We combineren inhoud, structuur, ontwerp en techniek tot een website die voor bezoekers én beheerders werkt.',
     deliverables: ['een heldere sitestructuur', 'een responsive ontwerp', 'een toegankelijke website'],
     hub: 'webdesign', audience: 'Webdesign is geschikt als je een nieuwe website nodig hebt of een bestaande site grondig wilt verbeteren.',
-    process: ['We bespreken je organisatie, bezoekers en doelen.', 'We bepalen de inhoud en structuur.', 'We ontwerpen en bouwen de website.', 'We testen samen en begeleiden de livegang.'],
+    contentBlocks: [
+      {
+        type: 'steps', eyebrow: 'Van structuur naar livegang', title: 'Een website in heldere stappen',
+        intro: 'We maken keuzes over inhoud en ontwerp voordat we bouwen, en testen de complete site voordat die live gaat.',
+        steps: [
+          { phase: 'Fase 1', title: 'Doelen en bezoekers', description: 'We bespreken je organisatie, bezoekers en doelen en bepalen welke taken de website moet ondersteunen.', tags: ['Doelen', 'Gebruikers', 'Inhoud'] },
+          { phase: 'Fase 2', title: 'Structuur en ontwerp', description: 'We ordenen de pagina’s en werken de belangrijkste schermen uit tot een ontwerp dat je kunt beoordelen.', tags: ['Structuur', 'Wireframes', 'Ontwerp'] },
+          { phase: 'Fase 3', title: 'Bouwen en invullen', description: 'We realiseren het ontwerp en plaatsen de afgesproken inhoud in een website die op verschillende schermen werkt.', tags: ['Ontwikkeling', 'Content', 'Responsive'] },
+          { phase: 'Fase 4', title: 'Testen en publiceren', description: 'We controleren de pagina’s, formulieren en bediening. Daarna begeleiden we de livegang en dragen het beheer over.', tags: ['Toegankelijkheid', 'Controle', 'Livegang'] },
+        ],
+      },
+    ],
     subservices: webdesignSubservices, category: 'webdesign', faq: hubFaq('webdesign'),
   },
 ];

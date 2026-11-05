@@ -2,6 +2,8 @@
 
 Statische website voor CF Media, gebouwd met Astro, Tailwind CSS 4 en Astro Content Collections. De site bevat SEO-, GEO- en webdesignpagina’s, een kennisbank, cases en contact.
 
+Het kleurpalet gebruikt bijna-wit (`#f7f7f5`), inktzwart (`#171819`), vermiljoen (`#c43d28`) en één zachte neutrale vlaktint (`#ecece8`). `prefers-color-scheme` schakelt automatisch naar de donkere tokens.
+
 ## Lokaal starten
 
 Vereist Node.js 24 of hoger.
@@ -41,6 +43,7 @@ De productiebuild is statisch en kan op Netlify of Vercel worden gehost. Stel de
 ## Inhoud beheren
 
 - Diensten en FAQ’s staan centraal in `src/data/services.ts`.
+- Extra dienstinhoud voeg je per hub toe aan `contentBlocks`: `steps` voor een stappenplan of `text` voor aanvullende uitleg. Laat de renderer in `src/components/ServiceContentBlocks.astro` de vormgeving verzorgen.
 - Cases zijn Markdown-bestanden in `src/content/cases/` en gebruiken het schema in `src/content.config.ts`.
 - Kennisbankartikelen staan in `src/content/articles/{seo,geo,webdesign}/`.
 - Artikelen vereisen titel, beschrijving, auteur, `datePublished`, `dateModified`, categorie en dienst-tags.
