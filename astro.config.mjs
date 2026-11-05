@@ -7,7 +7,10 @@ export default defineConfig({
   site: 'https://www.cfmedia.nl',
   trailingSlash: 'always',
   output: 'static',
-  integrations: [mdx(), sitemap()],
+  integrations: [
+    mdx(),
+    sitemap({ filter: (page) => !page.endsWith('/404/') && !page.endsWith('/contact/bedankt/') }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

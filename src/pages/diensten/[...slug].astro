@@ -84,9 +84,9 @@ const structuredData = [breadcrumbSchema(crumbs), serviceSchema, ...(isServiceHu
 
 <style>
   .page-hero { padding-block: 3rem 4rem; }
-  h1 { max-width: 18ch; margin: 0.8rem 0 1rem; font-size: clamp(2.5rem, 6vw, 5.5rem); line-height: 1.02; }
-  .summary { max-width: 48rem; margin: 0; color: var(--muted); font-size: clamp(1.1rem, 2vw, 1.35rem); line-height: 1.6; }
-  h2 { margin: 0.4rem 0 0.8rem; font-size: clamp(1.5rem, 3vw, 2.2rem); line-height: 1.15; }
+  h1 { max-width: 18ch; margin: 0.8rem 0 1rem; font-size: var(--type-h1); line-height: 1.02; }
+  .summary { max-width: 48rem; margin: 0; color: var(--muted); font-size: var(--type-lead); line-height: 1.6; }
+  h2 { margin: 0.4rem 0 0.8rem; font-size: var(--type-h2-medium); line-height: 1.15; }
   .intro-grid, .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3rem; padding-block: 3rem; border-top: 1px solid var(--line); }
   .intro-grid p:last-child, .detail-grid p:last-child { max-width: 36rem; color: var(--muted); line-height: 1.7; }
   .deliverables { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding-block: 3rem; border-top: 1px solid var(--line); }
@@ -107,7 +107,7 @@ const structuredData = [breadcrumbSchema(crumbs), serviceSchema, ...(isServiceHu
   .knowledge-link p:last-child { max-width: 42rem; margin-bottom: 0; }
   .faq-section h2 { margin-bottom: 2rem; }
   .service-cta { margin-block: 2rem 5rem; padding: clamp(1.5rem, 5vw, 4rem); background: var(--green-bright); }
-  .service-cta h2 { max-width: 16ch; margin: 0 0 1.5rem; font-size: clamp(2rem, 4vw, 3.5rem); }
+  .service-cta h2 { max-width: 16ch; margin: 0 0 1.5rem; font-size: var(--type-h2); }
   @media (max-width: 700px) { .intro-grid, .detail-grid, .deliverables { grid-template-columns: 1fr; gap: 1.2rem; } .process ol { grid-template-columns: repeat(2, 1fr); } .subservice-grid { grid-template-columns: 1fr; } .knowledge-link { align-items: flex-start; flex-direction: column; } }
   @media (max-width: 420px) { .process ol { grid-template-columns: 1fr; } }
 </style>

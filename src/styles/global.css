@@ -14,6 +14,16 @@
   --green-bright: #9ce0b1;
   --coral: #ff765e;
   --surface: #ffffff;
+  --button-ink: #ffffff;
+  --hero-bg: #176844;
+  --type-h1: 5rem;
+  --type-h1-hero: 6.5rem;
+  --type-h2: 3.4rem;
+  --type-h2-medium: 2.2rem;
+  --type-h2-small: 2rem;
+  --type-lead: 1.25rem;
+  --type-watermark: 36rem;
+  --type-watermark-vertical: 4rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -26,6 +36,20 @@
     --green-bright: #244b34;
     --coral: #ff8b76;
     --surface: #19241d;
+    --button-ink: #111a15;
+  }
+}
+
+@media (max-width: 760px) {
+  :root {
+    --type-h1: 3rem;
+    --type-h1-hero: 3rem;
+    --type-h2: 2.1rem;
+    --type-h2-medium: 1.75rem;
+    --type-h2-small: 1.5rem;
+    --type-lead: 1.05rem;
+    --type-watermark: 14rem;
+    --type-watermark-vertical: 2rem;
   }
 }
 
@@ -95,7 +119,7 @@ textarea {
   padding: 0.7rem 1rem;
   border: 1px solid var(--green);
   background: var(--green);
-  color: #fff;
+  color: var(--button-ink);
   font-weight: 700;
   text-decoration: none;
 }
@@ -103,6 +127,7 @@ textarea {
 .button-primary:hover {
   background: var(--ink);
   border-color: var(--ink);
+  color: var(--paper);
 }
 
 .section-space {

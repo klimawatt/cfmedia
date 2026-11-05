@@ -49,7 +49,7 @@ De productiebuild is statisch en kan op Netlify of Vercel worden gehost. Stel de
 
 ## Routes
 
-De site gebruikt kleine letters, koppeltekens en trailing slashes. De hoofdroutes zijn `/`, `/diensten/` met SEO-, GEO- en webdesignhubs en hun subpagina’s, `/cases/`, `/kennisbank/` met categorieën, `/tarieven/`, `/over-ons/`, `/contact/` en `/privacyverklaring/`. Dynamische case-, artikel- en teamroutes worden vanuit content gegenereerd. Astro levert daarnaast `404.html` voor hostingplatforms.
+De site gebruikt kleine letters, koppeltekens en trailing slashes. De hoofdroutes zijn `/`, `/diensten/` met SEO-, GEO- en webdesignhubs en hun subpagina’s, `/cases/`, `/kennisbank/` met categorieën, `/tarieven/`, `/over-ons/`, `/contact/` en `/privacyverklaring/`. Dynamische case-, artikel- en teamroutes worden vanuit content gegenereerd. De build maakt `/404/` en kopieert dezelfde pagina naar `404.html` voor hostingplatforms.
 
 ## Invulvelden vóór publicatie
 

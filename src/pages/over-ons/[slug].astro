@@ -46,7 +46,7 @@ const structuredData = [breadcrumbSchema(crumbs), {
 <style>
   .profile { display: grid; grid-template-columns: minmax(12rem, 20rem) minmax(0, 1fr); align-items: center; gap: clamp(2rem, 7vw, 6rem); padding-block: 4rem 7rem; }
   .profile :global(img) { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; }
-  h1 { max-width: 15ch; margin: 0.75rem 0; font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1.02; overflow-wrap: anywhere; }
+  h1 { max-width: 15ch; margin: 0.75rem 0; font-size: var(--type-h1); line-height: 1.02; overflow-wrap: anywhere; }
   .job-title { font-weight: 700; }
   .profile > div > p:not(.eyebrow) { color: var(--muted); line-height: 1.65; }
   .notice { margin-block: 2rem; padding: 1rem; border-left: 3px solid var(--coral); background: var(--surface); }
