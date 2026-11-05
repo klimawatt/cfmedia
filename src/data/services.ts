@@ -24,10 +24,34 @@ export interface ServiceTextBlock {
   type: 'text';
   eyebrow: string;
   title: string;
-  paragraphs: string[];
+  paragraphs?: string[];
+  html?: string;
 }
 
-export type ServiceContentBlock = ServiceStepsBlock | ServiceTextBlock;
+export interface ServiceChecklistBlock {
+  type: 'checklist';
+  eyebrow: string;
+  title: string;
+  items: string[];
+}
+
+export interface ServiceCalloutBlock {
+  type: 'callout';
+  eyebrow: string;
+  title: string;
+  text: string;
+  buttonLabel?: string;
+  buttonHref?: string;
+}
+
+export interface ServiceFaqBlock {
+  type: 'faq';
+  eyebrow: string;
+  title: string;
+  questions: ServiceFaq[];
+}
+
+export type ServiceContentBlock = ServiceStepsBlock | ServiceTextBlock | ServiceChecklistBlock | ServiceCalloutBlock | ServiceFaqBlock;
 
 export interface ServicePage {
   slug: string;

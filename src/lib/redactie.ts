@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import { collections, seoFields, SERVICE_TAGS, type CollectionDef, type Field, type FixedItem } from './cms-schema';
+import { collections, prepareValues, seoFields, SERVICE_TAGS, type CollectionDef, type Field, type FixedItem } from './cms-schema';
+import { createRichText, type RichText } from './rte';
+import { renderPreview } from './preview';
 
 interface Row { id: string; collection: string; slug: string; title: string; data: Record<string, any>; status: 'draft' | 'published'; version: number; published_at: string | null }
 interface Current { row?: Row; item?: FixedItem; slug: string; title: string }
@@ -11,6 +13,7 @@ const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 let active = 'article';
 let rows: Row[] = [];
 let current: Current | null = null;
+const richTexts = new WeakMap<HTMLElement, RichText>();
 
 function make<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, string> = {}, text = ''): HTMLElementTagNameMap[K] {
   const node = document.createElement(tag);
@@ -54,6 +57,15 @@ function buildFields(fields: Field[], values: Record<string, any>, container: HT
 function buildField(field: Field, value: unknown): HTMLElement {
   const wrap = make('div', { class: 'field', 'data-key': field.key });
   if (field.type === 'repeater') return buildRepeater(field, wrap, value);
+  if (field.type === 'richtext') {
+    const labelId = `l-${Math.random().toString(36).slice(2)}`;
+    wrap.append(make('span', { id: labelId, class: 'repeater-label' }, field.required ? `${field.label} *` : field.label));
+    const rich = createRichText(String(value ?? ''), field.levels ?? [2, 3, 4], labelId, () => wrap.dispatchEvent(new Event('input', { bubbles: true })));
+    richTexts.set(wrap, rich);
+    wrap.append(rich.element);
+    if (field.help) wrap.append(make('p', { class: 'help' }, field.help));
+    return wrap;
+  }
 
   const id = `f-${Math.random().toString(36).slice(2)}`;
   wrap.append(make('label', { for: id }, field.required ? `${field.label} *` : field.label));
@@ -84,9 +96,19 @@ function buildRepeater(field: Field, wrap: HTMLElement, value: unknown): HTMLEle
     renumber(field, list);
   };
   for (const item of Array.isArray(value) ? value : []) add(item as Record<string, any>);
+  list.addEventListener('change', () => renumber(field, list));
   const addButton = make('button', { type: 'button', class: 'redactie-button small' }, `+ ${field.itemLabel ?? 'Item'} toevoegen`);
   addButton.addEventListener('click', () => { add({}); refreshSeo(); });
-  wrap.append(addButton);
+  if (field.addTypes?.length) {
+    const bar = make('div', { class: 'add-types' });
+    bar.append(make('span', { class: 'help' }, 'Toevoegen:'));
+    for (const option of field.addTypes) {
+      const button = make('button', { type: 'button', class: 'redactie-button small' }, `+ ${option.label}`);
+      button.addEventListener('click', () => { add({ type: option.value }); refreshSeo(); });
+      bar.append(button);
+    }
+    wrap.append(bar);
+  } else wrap.append(addButton);
   return wrap;
 }
 
@@ -113,7 +135,8 @@ function buildItem(field: Field, values: Record<string, any>, list: HTMLElement)
 
 function renumber(field: Field, list: HTMLElement) {
   list.querySelectorAll(':scope > .repeater-item > legend').forEach((legend, index) => {
-    legend.textContent = `${field.itemLabel ?? 'Item'} ${index + 1}`;
+    const kind = legend.parentElement?.querySelector<HTMLSelectElement>(':scope > .item-fields > [data-key="type"] > .ctl')?.selectedOptions[0]?.text;
+    legend.textContent = `${kind ?? field.itemLabel ?? 'Item'} ${index + 1}`;
   });
 }
 
@@ -134,6 +157,7 @@ function readFields(fields: Field[], container: HTMLElement): Record<string, any
 }
 
 function readField(field: Field, wrap: HTMLElement): any {
+  if (field.type === 'richtext') return richTexts.get(wrap)?.getHtml() ?? '';
   if (field.type === 'repeater') {
     return [...wrap.querySelectorAll<HTMLElement>(':scope > .repeater-items > .repeater-item')]
       .map((item) => readFields(field.fields ?? [], item.querySelector<HTMLElement>(':scope > .item-fields')!));
@@ -166,6 +190,7 @@ function refreshSeo() {
   const title: string = seo.title || context.defaultTitle;
   const description: string = seo.description || context.defaultDescription;
   const keyword = String(seo.focusKeyword ?? '').toLowerCase().trim();
+  const plainBody = context.body.replace(/<[^>]+>/g, ' ').toLowerCase();
 
   const preview = $('#seo-preview');
   preview.replaceChildren(
@@ -182,12 +207,16 @@ function refreshSeo() {
     checks.push(
       [title.toLowerCase().includes(keyword), 'Focuszoekwoord staat in de titel'],
       [description.toLowerCase().includes(keyword), 'Focuszoekwoord staat in de meta-omschrijving'],
-      [context.body.toLowerCase().includes(keyword), 'Focuszoekwoord komt voor in de tekst'],
+      [plainBody.includes(keyword), 'Focuszoekwoord komt voor in de tekst'],
       [context.path.includes(slugify(keyword)), 'Focuszoekwoord staat in de URL'],
     );
   } else checks.push([false, 'Vul een focuszoekwoord in voor extra controles']);
   const list = $('#seo-checks');
   list.replaceChildren(...checks.map(([ok, text]) => make('li', { class: ok ? 'ok' : 'bad' }, `${ok ? '✓' : '✗'} ${text}`)));
+
+  const blockPreview = renderPreview(values);
+  $('#preview-card').hidden = !blockPreview;
+  if (blockPreview) $('#block-preview').replaceChildren(blockPreview);
 }
 
 // ---------- Lijst en editor ----------
@@ -208,11 +237,11 @@ function renderList() {
     for (const item of def.items!()) {
       const row = rows.find((candidate) => candidate.slug === item.slug);
       const badge = !row ? 'Standaardtekst' : row.status === 'published' ? 'Aangepast en gepubliceerd' : 'Concept (nog niet live)';
-      addEntry(item.title, badge, row?.status === 'published', () => openEditor({ row, item, slug: item.slug, title: item.title }, { ...item.defaults, ...(row?.data ?? {}) }));
+      addEntry(item.title, badge, row?.status === 'published', () => openEditor({ row, item, slug: item.slug, title: item.title }, prepareValues(active, item.slug, { ...item.defaults, ...(row?.data ?? {}) })));
     }
     return;
   }
-  for (const row of rows) addEntry(row.title, row.status === 'published' ? 'Gepubliceerd' : 'Concept', row.status === 'published', () => openEditor({ row, slug: row.slug, title: row.title }, { ...row.data, title: row.title, slug: row.slug }));
+  for (const row of rows) addEntry(row.title, row.status === 'published' ? 'Gepubliceerd' : 'Concept', row.status === 'published', () => openEditor({ row, slug: row.slug, title: row.title }, prepareValues(active, row.slug, { ...row.data, title: row.title, slug: row.slug })));
   if (!rows.length) list.append(make('li', { class: 'redactie-empty' }, 'Nog geen inhoud in deze lijst.'));
 }
 
@@ -307,7 +336,7 @@ async function save(status: 'draft' | 'published') {
   setStatus(status === 'published' ? 'Gepubliceerd. De website toont dit na de volgende build.' : 'Opgeslagen als concept. Het staat niet live.', 'ok');
   await loadRows();
   const item = def.fixed ? def.items!().find((candidate) => candidate.slug === saved!.slug) : undefined;
-  openEditor({ row: saved, item, slug: saved.slug, title: saved.title }, { ...(item?.defaults ?? {}), ...saved.data, title: saved.title, slug: saved.slug });
+  openEditor({ row: saved, item, slug: saved.slug, title: saved.title }, prepareValues(active, saved.slug, { ...(item?.defaults ?? {}), ...saved.data, title: saved.title, slug: saved.slug }));
 }
 
 async function remove() {

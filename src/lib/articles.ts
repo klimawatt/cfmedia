@@ -2,6 +2,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { marked } from 'marked';
 import fabianPortrait from '../assets/fabian-clemens.jpg';
 import { getCollectionEntries, type SeoOverride } from './cms';
+import { cleanHtml } from './html';
 
 type ArticleData = CollectionEntry<'articles'>['data'];
 
@@ -18,7 +19,7 @@ export async function getArticles({ includeDrafts = false } = {}): Promise<Artic
   const stored = (await getCollectionEntries('article')).map((row): ArticleView => ({
     id: `db/${row.slug}`,
     seo: row.data.seo,
-    html: marked.parse(String(row.data.body ?? ''), { async: false }) as string,
+    html: row.data.bodyHtml ? cleanHtml(String(row.data.bodyHtml)) : (marked.parse(String(row.data.body ?? ''), { async: false }) as string),
     data: {
       title: row.title,
       description: String(row.data.description ?? ''),

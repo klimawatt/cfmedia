@@ -6,9 +6,11 @@ export interface Option { value: string; label: string }
 export interface Field {
   key: string;
   label: string;
-  type: 'text' | 'textarea' | 'select' | 'tags' | 'lines' | 'repeater';
+  type: 'text' | 'textarea' | 'select' | 'tags' | 'lines' | 'repeater' | 'richtext';
   help?: string;
   rows?: number;
+  levels?: number[];
+  addTypes?: Option[];
   required?: boolean;
   options?: Option[];
   fallback?: string;
@@ -50,8 +52,16 @@ export const seoFields: Field[] = [
   t('seo.ogImage', 'Deelafbeelding (URL)', { help: 'Volledige URL van een afbeelding voor delen op social media. Leeg laten gebruikt de standaardafbeelding.' }),
 ];
 
+const blockTypes: Option[] = [
+  { value: 'steps', label: 'Stappenplan' },
+  { value: 'text', label: 'Tekst' },
+  { value: 'checklist', label: 'Checklist' },
+  { value: 'callout', label: 'Uitgelichte oproep' },
+  { value: 'faq', label: 'Veelgestelde vragen' },
+];
+
 const blockFields: Field[] = [
-  { key: 'type', label: 'Soort blok', type: 'select', options: [{ value: 'steps', label: 'Stappenplan' }, { value: 'text', label: 'Tekstblok' }] },
+  { key: 'type', label: 'Soort blok', type: 'select', options: blockTypes },
   t('eyebrow', 'Klein label boven de titel'),
   t('title', 'Titel'),
   ta('intro', 'Inleiding', 3, { showIf: { key: 'type', equals: 'steps' } }),
@@ -59,7 +69,12 @@ const blockFields: Field[] = [
     key: 'steps', label: 'Stappen', type: 'repeater', itemLabel: 'Stap', showIf: { key: 'type', equals: 'steps' },
     fields: [t('phase', 'Fase (bijvoorbeeld Fase 1)'), t('title', 'Titel'), ta('description', 'Uitleg', 3), { key: 'tags', label: 'Tags', type: 'tags', help: 'Gescheiden door komma’s.' }],
   },
-  lines('paragraphs', 'Alinea’s', 'Elke regel is een aparte alinea.', { showIf: { key: 'type', equals: 'text' } }),
+  { key: 'html', label: 'Tekst', type: 'richtext', levels: [3, 4], showIf: { key: 'type', equals: 'text' } },
+  lines('items', 'Punten', 'Eén regel per punt.', { showIf: { key: 'type', equals: 'checklist' } }),
+  ta('text', 'Tekst', 3, { showIf: { key: 'type', equals: 'callout' } }),
+  t('buttonLabel', 'Knoptekst (optioneel)', { showIf: { key: 'type', equals: 'callout' } }),
+  t('buttonHref', 'Knop-link, bijvoorbeeld /contact/', { showIf: { key: 'type', equals: 'callout' } }),
+  { key: 'questions', label: 'Vragen', type: 'repeater', itemLabel: 'Vraag', showIf: { key: 'type', equals: 'faq' }, fields: [t('question', 'Vraag'), ta('answer', 'Antwoord', 3)] },
 ];
 
 const serviceFields: Field[] = [
@@ -69,7 +84,7 @@ const serviceFields: Field[] = [
   ta('audience', 'Voor wie (alleen op hoofdpagina’s)', 3),
   lines('deliverables', 'Wat je krijgt'),
   { key: 'faq', label: 'Veelgestelde vragen', type: 'repeater', itemLabel: 'Vraag', fields: [t('question', 'Vraag'), ta('answer', 'Antwoord', 3)] },
-  { key: 'contentBlocks', label: 'Extra blokken (stappenplannen en tekst)', type: 'repeater', itemLabel: 'Blok', fields: blockFields, help: 'Voeg zoveel stappenplannen of tekstblokken toe als je wilt. Ze staan onder “Wat je krijgt”.' },
+  { key: 'contentBlocks', label: 'Extra blokken (stappenplannen en tekst)', type: 'repeater', itemLabel: 'Blok', addTypes: blockTypes, fields: blockFields, help: 'Kies met de knoppen onderaan welk blok je wilt toevoegen. Blokken staan onder “Wat je krijgt”.' },
 ];
 
 const homeFields: Field[] = [
@@ -92,7 +107,7 @@ const tarievenFields: Field[] = [
 
 const overMijFields: Field[] = [
   t('name', 'Naam'), t('role', 'Functie'), ta('intro', 'Korte introductie', 3),
-  t('storyTitle', 'Titel van het verhaal'), ta('story', 'Mijn verhaal', 12, { help: 'Een lege regel start een nieuwe alinea.' }),
+  t('storyTitle', 'Titel van het verhaal'), { key: 'story', label: 'Mijn verhaal', type: 'richtext', levels: [3, 4], help: 'Je kunt opgemaakte tekst plakken. Kop 1 en 2 zijn niet beschikbaar: de pagina heeft die al.' },
   lines('expertise', 'Expertise'),
   { key: 'links', label: 'Profielen (LinkedIn, Frankwatching, …)', type: 'repeater', itemLabel: 'Profiel', fields: [t('label', 'Naam'), t('href', 'URL')] },
   t('ctaTitle', 'Afsluitende oproep: titel'),
@@ -120,9 +135,9 @@ export const collections: Record<string, CollectionDef> = {
       t('authorName', 'Auteur', { fallback: 'Fabian Clemens' }),
       t('authorJobTitle', 'Functie auteur', { fallback: 'Eigenaar van CF Media' }),
       t('coverAlt', 'Beschrijving van de coverafbeelding', { help: 'Afbeeldingen uploaden volgt in een volgende stap.' }),
-      ta('body', 'Tekst (Markdown)', 18, { required: true, help: 'Gebruik ## voor tussenkoppen en - voor opsommingen.' }),
+      { key: 'bodyHtml', label: 'Tekst', type: 'richtext', levels: [2, 3, 4], required: true, help: 'Plak gerust opgemaakte tekst of code. Kop 1 is niet beschikbaar: elke pagina heeft al één hoofdkop.' },
     ],
-    context: (slug, v) => ({ path: `/kennisbank/${v.category || 'seo'}/${slug}/`, defaultTitle: `${v.title ?? ''} | CF Media`, defaultDescription: String(v.description ?? ''), body: String(v.body ?? '') }),
+    context: (slug, v) => ({ path: `/kennisbank/${v.category || 'seo'}/${slug}/`, defaultTitle: `${v.title ?? ''} | CF Media`, defaultDescription: String(v.description ?? ''), body: String(v.bodyHtml ?? v.body ?? '') }),
   },
   case: {
     label: 'Cases', fixed: false,
@@ -165,3 +180,18 @@ export const collections: Record<string, CollectionDef> = {
     context: (_slug, v, item) => ({ path: item?.meta.path ?? '/', defaultTitle: item?.meta.title ?? '', defaultDescription: item?.meta.description ?? '', body: joinText(v, ['heroIntro', 'intro', 'story']) }),
   },
 };
+
+const escapeHtml = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const toParagraphs = (items: string[]) => items.map((item) => item.trim()).filter(Boolean).map((item) => `<p>${escapeHtml(item)}</p>`).join('');
+
+// Zet oudere platte tekst om naar HTML, zodat de editor het kan tonen.
+export function prepareValues(collection: string, slug: string, values: Record<string, any>): Record<string, any> {
+  const next = { ...values };
+  if (collection === 'service' && Array.isArray(next.contentBlocks)) {
+    next.contentBlocks = next.contentBlocks.map((block: any) => (block.type === 'text' && !block.html && Array.isArray(block.paragraphs) ? { ...block, html: toParagraphs(block.paragraphs) } : block));
+  }
+  if (collection === 'page' && slug === 'over-mij' && typeof next.story === 'string' && next.story && !/^\s*</.test(next.story)) {
+    next.story = toParagraphs(next.story.split(/\n\s*\n/));
+  }
+  return next;
+}

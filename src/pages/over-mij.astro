@@ -5,12 +5,14 @@ import SiteLayout from '../layouts/SiteLayout.astro';
 import fabianPortrait from '../assets/fabian-clemens.jpg';
 import { pageDefaults } from '../data/pages';
 import { getPageContent, seoProps } from '../lib/cms';
+import { cleanHtml, looksLikeHtml } from '../lib/html';
 import { breadcrumbSchema } from '../utils/structured-data';
 
 const c = await getPageContent('over-mij', pageDefaults['over-mij']);
 const name = c.name;
 const role = c.role;
 const biography = c.story;
+const storyIsHtml = looksLikeHtml(biography);
 const profileLinks = c.links;
 const canonical = 'https://www.cfmedia.nl/over-mij/';
 const crumbs = [{ label: 'Home', href: '/' }, { label: 'Over mij', href: '/over-mij/' }];
@@ -47,7 +49,7 @@ const seo = seoProps(c.seo, { title: `Over ${name} | CF Media`, description: `Ma
   </section>
   <section id="mijn-verhaal" class="container story-section">
     <div><p class="eyebrow">Mijn verhaal</p><h2>{c.storyTitle}</h2></div>
-    <div class="story-copy">{biography.split(/\n\s*\n/).map((paragraph) => <p>{paragraph}</p>)}<div class="expertise">{c.expertise.map((item) => <span>{item}</span>)}</div></div>
+    <div class="story-copy">{storyIsHtml ? <div class="story-rich" set:html={cleanHtml(biography)} /> : biography.split(/\n\s*\n/).map((paragraph) => <p>{paragraph}</p>)}<div class="expertise">{c.expertise.map((item) => <span>{item}</span>)}</div></div>
   </section>
   <section class="profile-cta"><div class="container cta-inner"><div><p class="eyebrow">Samenwerken</p><h2>{c.ctaTitle}</h2></div><a class="button-primary" href="/contact/">Neem contact op <span aria-hidden="true">↗</span></a></div></section>
 </SiteLayout>
@@ -70,6 +72,11 @@ const seo = seoProps(c.seo, { title: `Over ${name} | CF Media`, description: `Ma
   .story-section { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 3rem; padding-block: 5rem; }
   .story-section h2, .cta-inner h2 { max-width: 15ch; margin: 0.5rem 0; font-size: var(--type-h2); line-height: 1.08; }
   .story-copy { max-width: 46rem; color: var(--muted); font-size: 1.08rem; line-height: 1.8; }
+  .story-rich :global(h3) { margin: 1.6rem 0 0.5rem; color: var(--ink); font-size: 1.4rem; }
+  .story-rich :global(h4) { margin: 1.3rem 0 0.4rem; color: var(--ink); font-size: 1.15rem; }
+  .story-rich :global(a) { color: var(--accent); text-underline-offset: 0.2em; }
+  .story-rich :global(blockquote) { margin: 1.5rem 0; padding: 0.8rem 1.2rem; border-left: 3px solid var(--accent); background: var(--surface); color: var(--ink); }
+  .story-rich :global(pre) { overflow-x: auto; padding: 1rem; background: var(--night); color: var(--night-ink); font-size: 0.85rem; }
   .expertise { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin-top: 1.5rem; color: var(--accent); font-size: 0.8rem; font-weight: 700; }
   .expertise span + span::before { margin-right: 1.25rem; color: var(--line); content: '/'; }
   .profile-cta { padding-block: 3.5rem; background: var(--surface-soft); }
