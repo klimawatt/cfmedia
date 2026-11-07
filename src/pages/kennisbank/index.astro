@@ -1,44 +1,147 @@
 ---
-import { ArrowUpRight } from '@lucide/astro';
+import { ArrowUpRight, Search } from '@lucide/astro';
+import { Image } from 'astro:assets';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import SiteLayout from '../../layouts/SiteLayout.astro';
+import { getArticles } from '../../lib/articles';
+import seoDashboard from '../../assets/seo-dashboard.jpg';
 import { breadcrumbSchema } from '../../utils/structured-data';
 
 const categories = [
-  { slug: 'seo', name: 'SEO', description: 'Techniek, inhoud en organische vindbaarheid.' },
-  { slug: 'geo', name: 'GEO', description: 'Informatie vindbaar maken in AI-zoekervaringen.' },
-  { slug: 'webdesign', name: 'Webdesign', description: 'Websites die helder, toegankelijk en prettig in gebruik zijn.' },
+  { slug: 'seo', name: 'SEO' },
+  { slug: 'geo', name: 'GEO' },
+  { slug: 'webdesign', name: 'Webdesign' },
 ];
+const categoryNames = Object.fromEntries(categories.map(({ slug, name }) => [slug, name]));
+const articles = (await getArticles({ includeDrafts: import.meta.env.DEV }))
+  .sort((a, b) => b.data.datePublished.localeCompare(a.data.datePublished));
 const crumbs = [{ label: 'Home', href: '/' }, { label: 'Kennisbank', href: '/kennisbank/' }];
 const structuredData = breadcrumbSchema(crumbs);
 ---
 
-<SiteLayout title="Kennisbank | CF Media" description="Lees inzichten over SEO, GEO en webdesign. Praktische uitleg voor betere vindbaarheid en websites die prettig werken." canonical="https://www.cfmedia.nl/kennisbank/" structuredData={structuredData}>
-  <Breadcrumbs items={crumbs} />
-  <header class="container page-hero">
-    <div><p class="eyebrow">CF Media / kennisbank</p><h1>Kennis die je verder brengt.</h1><p>Korte uitleg en praktische inzichten over online vindbaarheid en websites. We publiceren artikelen zodra ze inhoudelijk zijn gecontroleerd.</p></div>
-    <div class="editorial-note"><span>CF / REDACTIE</span><strong>Helder antwoord.<br />Praktische volgende stap.</strong><span>SEO · GEO · WEB</span></div>
+<SiteLayout title="Kennisbank | CF Media" description="Lees praktische inzichten over SEO, GEO en webdesign. Heldere uitleg voor betere vindbaarheid en websites die prettig werken." canonical="https://www.cfmedia.nl/kennisbank/" structuredData={structuredData}>
+  <div class="container breadcrumb-wrap"><Breadcrumbs items={crumbs} /></div>
+  <header class="container knowledge-hero">
+    <Image src={seoDashboard} alt="Websitegegevens op een analyticsdashboard" width={1440} height={960} format="webp" sizes="(max-width: 760px) 100vw, 76rem" loading="eager" />
+    <div class="hero-copy">
+      <p class="eyebrow">CF Media / kennisbank</p>
+      <h1>Kennis die je website verder brengt.</h1>
+      <p>Praktische inzichten over SEO, GEO en webdesign. Heldere uitleg om je website beter vindbaar, begrijpelijker en prettiger in gebruik te maken.</p>
+    </div>
+    <span class="hero-index" aria-hidden="true">INZICHT / ACTIE</span>
   </header>
-  <section class="container category-list" aria-label="Kennisbankcategorieën">
-    {categories.map((category, index) => <a class={`category-card tone-${index}`} href={`/kennisbank/${category.slug}/`}><span class="card-label">0{index + 1} / DOSSIER</span><span class="category-glyph" aria-hidden="true">{category.name.slice(0, 1)}</span><span class="card-content"><h2>{category.name}</h2><p>{category.description}</p><span class="card-link">Bekijk {category.name} <ArrowUpRight size={17} aria-hidden="true" /></span></span></a>)}
+
+  <section class="container discovery" aria-label="Artikelen vinden">
+    <nav class="quick-links" aria-label="Kennisbankcategorieën">
+      <a class="quick-link is-active" href="#artikelen" aria-current="page">Alle artikelen</a>
+      {categories.map((category) => <a class="quick-link" href={`/kennisbank/${category.slug}/`}>{category.name}</a>)}
+    </nav>
+    <label class="search-box">
+      <span class="visually-hidden">Zoek een artikel</span>
+      <input id="article-search" type="search" placeholder="Zoek een artikel" autocomplete="off" aria-controls="article-list" />
+      <Search size={20} aria-hidden="true" />
+    </label>
+  </section>
+
+  <section id="artikelen" class="container articles-section" aria-labelledby="articles-title">
+    <div class="section-heading">
+      <div><p class="eyebrow">CF Media / artikelen</p><h2 id="articles-title">Alle artikelen</h2></div>
+      {articles.length > 0 && <p class="article-count">{articles.length} {articles.length === 1 ? 'artikel' : 'artikelen'}</p>}
+    </div>
+    {articles.length > 0 ? <div id="article-list" class="article-list">
+      {articles.map((article) => {
+        const slug = article.id.split('/').at(-1)!;
+        const categoryName = categoryNames[article.data.category] ?? article.data.category;
+        const articleHref = `/kennisbank/${article.data.category}/${slug}/`;
+        return <article class:list={['article-card', { 'is-draft': article.data.draft }]} data-search={`${article.data.title} ${article.data.description} ${categoryName}`}>
+          {article.data.cover && <a class="article-image" href={articleHref} tabindex={article.data.draft ? -1 : undefined} aria-hidden={article.data.draft ? 'true' : undefined}><Image src={article.data.cover} alt={article.data.coverAlt ?? ''} width={article.data.cover.width} height={article.data.cover.height} format="webp" sizes="(max-width: 700px) 100vw, 36vw" loading="lazy" /></a>}
+          <div class="article-content">
+            <p class="article-category">{categoryName}{article.data.draft && <span>Concept</span>}</p>
+            <h3>{article.data.draft ? article.data.title : <a href={articleHref}>{article.data.title}</a>}</h3>
+            <p class="article-description">{article.data.description}</p>
+            {!article.data.draft && <a class="read-link" href={articleHref}>Lees het artikel <ArrowUpRight size={16} aria-hidden="true" /></a>}
+          </div>
+        </article>;
+      })}
+    </div> : <div class="empty-state"><h3>De eerste artikelen worden voorbereid.</h3><p>We publiceren nieuwe kennis zodra de inhoud zorgvuldig is gecontroleerd. Kies alvast een onderwerp om meer te lezen.</p><div>{categories.map((category) => <a href={`/kennisbank/${category.slug}/`}>{category.name} <ArrowUpRight size={15} aria-hidden="true" /></a>)}</div></div>}
+    {articles.length > 0 && <p id="no-results" class="empty-results" role="status" hidden>Geen artikelen gevonden. Probeer een andere zoekterm.</p>}
   </section>
 </SiteLayout>
 
+<script>
+  const searchInput = document.querySelector<HTMLInputElement>('#article-search');
+  const articleCards = Array.from(document.querySelectorAll<HTMLElement>('.article-card'));
+  const noResults = document.querySelector<HTMLElement>('#no-results');
+
+  searchInput?.addEventListener('input', () => {
+    const query = searchInput.value.trim().toLocaleLowerCase('nl-NL');
+    let visibleCount = 0;
+
+    articleCards.forEach((card) => {
+      const matches = (card.dataset.search ?? '').toLocaleLowerCase('nl-NL').includes(query);
+      card.hidden = !matches;
+      if (matches) visibleCount += 1;
+    });
+
+    if (noResults) noResults.hidden = visibleCount > 0;
+  });
+</script>
+
 <style>
-  .page-hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(16rem, 0.7fr); align-items: center; gap: 3rem; padding-block: 3.5rem 4rem; }
-  h1 { max-width: 12ch; margin: 0.75rem 0; font-size: var(--type-h1); line-height: 1.02; }
-  .page-hero > div:first-child > p:last-child { max-width: 44rem; color: var(--muted); font-size: 1.1rem; line-height: 1.65; }
-  .editorial-note { display: flex; min-height: 15rem; flex-direction: column; justify-content: space-between; padding: 1.25rem; background: var(--green-bright); color: var(--ink); }
-  .editorial-note span { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; }
-  .editorial-note strong { font-size: 1.8rem; line-height: 1.1; }
-  .category-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8rem; padding-bottom: 6rem; }
-  .category-card { position: relative; display: flex; min-width: 0; min-height: 22rem; flex-direction: column; justify-content: space-between; overflow: hidden; padding: 1.15rem; border-top: 3px solid var(--accent); background: var(--surface-soft); color: var(--ink); text-decoration: none; }
-  .tone-0, .tone-1, .tone-2 { background: var(--surface-soft); }
-  .card-label { position: relative; z-index: 1; font-size: 0.7rem; font-weight: 700; }
-  .category-glyph { position: absolute; top: 2rem; right: -0.5rem; color: color-mix(in srgb, var(--ink) 8%, transparent); font-size: 12rem; font-weight: 800; line-height: 1; }
-  .card-content { position: relative; z-index: 1; }
-  h2 { margin: 0; font-size: 2rem; }
-  .category-card p { max-width: 27ch; min-height: 3rem; margin: 0.5rem 0; line-height: 1.55; }
-  .card-link { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.65rem; font-size: 0.82rem; font-weight: 700; }
-  @media (max-width: 760px) { .page-hero { grid-template-columns: 1fr; gap: 1.5rem; } .category-list { grid-template-columns: 1fr; } .category-card { min-height: 17rem; } }
+  .breadcrumb-wrap { border-bottom: 1px solid var(--line); }
+  .knowledge-hero { position: relative; display: flex; min-height: 27rem; align-items: center; overflow: hidden; margin-top: 1.25rem; padding: clamp(2rem, 5vw, 4rem); background: var(--surface); }
+  .knowledge-hero :global(> img) { position: absolute; inset: 0 0 0 auto; width: 65%; height: 100%; object-fit: cover; object-position: center; }
+  .knowledge-hero::after { position: absolute; inset: 0; background: linear-gradient(90deg, var(--surface) 0%, var(--surface) 34%, color-mix(in srgb, var(--surface) 92%, transparent) 53%, color-mix(in srgb, var(--surface) 5%, transparent) 100%); content: ''; }
+  .hero-copy { position: relative; z-index: 1; width: min(100%, 41rem); }
+  h1 { max-width: 13ch; margin: 0.75rem 0 1rem; font-size: clamp(2.6rem, 5.5vw, 4.7rem); line-height: 1.02; }
+  .hero-copy > p:last-child { max-width: 39rem; margin: 0; color: var(--muted); font-size: clamp(1rem, 1.6vw, 1.2rem); line-height: 1.7; }
+  .hero-index { position: absolute; z-index: 1; right: 1.25rem; bottom: 1.1rem; color: var(--night-ink); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; }
+  .discovery { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: 2rem; }
+  .quick-links { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+  .quick-link { display: inline-flex; min-height: 2.8rem; align-items: center; justify-content: center; padding: 0.55rem 1rem; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); font-size: 0.88rem; font-weight: 700; text-decoration: none; transition: background 160ms ease, border-color 160ms ease; }
+  .quick-link:hover, .quick-link:focus-visible { border-color: var(--accent); }
+  .quick-link.is-active { border-color: var(--green); background: var(--green); color: var(--button-ink); }
+  .search-box { display: flex; width: min(100%, 22rem); min-height: 2.9rem; flex: 0 1 22rem; align-items: center; gap: 0.65rem; padding: 0.3rem 0.8rem 0.3rem 1rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--green); }
+  .search-box:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .search-box input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); }
+  .search-box input::placeholder { color: var(--muted); opacity: 1; }
+  .articles-section { padding-bottom: 6rem; scroll-margin-top: 2rem; }
+  .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
+  .section-heading .eyebrow { margin: 0 0 0.4rem; }
+  h2 { margin: 0; font-size: var(--type-h2-medium); }
+  .article-count { margin: 0; color: var(--muted); font-size: 0.9rem; }
+  .article-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  .article-card { min-width: 0; overflow: hidden; border: 1px solid var(--line); background: var(--surface); }
+  .article-card[hidden] { display: none; }
+  .article-image { display: block; overflow: hidden; background: var(--surface-soft); }
+  .article-image :global(img) { display: block; width: 100%; aspect-ratio: 1.7; object-fit: cover; transition: transform 200ms ease; }
+  .article-image:hover :global(img) { transform: scale(1.025); }
+  .article-content { display: flex; min-height: 15rem; flex-direction: column; align-items: flex-start; padding: 1.15rem; }
+  .article-category { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 0.55rem; color: var(--green); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; }
+  .article-category span { padding: 0.2rem 0.4rem; background: var(--surface-soft); color: var(--muted); font-size: 0.66rem; }
+  h3 { margin: 0; font-size: 1.35rem; line-height: 1.2; }
+  h3 a { text-decoration: none; }
+  h3 a:hover { color: var(--accent-hover); }
+  .article-description { margin: 0.65rem 0 1rem; color: var(--muted); font-size: 0.93rem; line-height: 1.55; }
+  .read-link { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: auto; color: var(--green); font-size: 0.85rem; font-weight: 700; text-underline-offset: 0.18em; }
+  .article-card.is-draft { border-style: dashed; }
+  .empty-state, .empty-results { padding: 1.5rem; border-left: 3px solid var(--accent); background: var(--surface); }
+  .empty-state h3 { margin-bottom: 0.5rem; }
+  .empty-state > p { max-width: 48rem; color: var(--muted); line-height: 1.6; }
+  .empty-state > div { display: flex; flex-wrap: wrap; gap: 1rem; }
+  .empty-state a { display: inline-flex; align-items: center; gap: 0.25rem; color: var(--green); font-weight: 700; }
+  .empty-results[hidden] { display: none; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
+  @media (max-width: 900px) { .article-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 760px) {
+    .knowledge-hero { min-height: 29rem; align-items: flex-end; margin-top: 1rem; padding: 2rem 1.4rem; }
+    .knowledge-hero :global(> img) { width: 100%; }
+    .knowledge-hero::after { background: linear-gradient(0deg, var(--surface) 0%, color-mix(in srgb, var(--surface) 96%, transparent) 42%, color-mix(in srgb, var(--surface) 8%, transparent) 100%); }
+    .hero-index { color: var(--ink); }
+    .discovery { align-items: stretch; flex-direction: column; }
+    .quick-links { flex-wrap: nowrap; overflow-x: auto; padding: 0.2rem 0.1rem 0.55rem; }
+    .quick-link { flex: 0 0 auto; }
+    .search-box { width: 100%; flex-basis: auto; }
+    .article-list { grid-template-columns: 1fr; }
+  }
 </style>
